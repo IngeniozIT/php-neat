@@ -112,7 +112,6 @@ class ConfigTest extends TestCase
 
     /**
      * @depends testConstruct
-     * @expectedException Exception
      */
     public function testBadFitnessThreshold(NEAT $neat)
     {
@@ -122,6 +121,7 @@ class ConfigTest extends TestCase
         $neat->fitnessThreshold('max', 84.0);
         $this->assertEquals($neat->getFitnessThreshold(), ['max', 84.0]);
 
+        $this->expectException(\Exception::class);
         $neat->fitnessThreshold('foo', 0.05);
     }
 
