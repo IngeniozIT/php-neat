@@ -14,16 +14,19 @@ class NeatTest extends TestCase
         $neat = new NEAT();
 
         // Create a genome pool with 50 genomes having 2 inputs and 1 output
-        $neat->genomePool(2, 1, 50);
+        $neat
+            ->nbInputs(2)
+            ->nbOutputs(1)
+            ->populationSize(50);
 
-        // The script should run for 100 generations max
-        $neat->maxGenerations(100);
-
-        // The script will stop when the minimum fitness reaches 0.05
-        $neat->fitnessThreshold(NEAT::FITNESS_MIN, 0.05);
-
-        // Set the fitness function
-        $neat->fitnessFunction([$this, 'xorFitnessFunction']);
+        // Evaluation settings
+        $neat
+            // The script should run for 100 generations max
+            ->maxGenerations(100)
+            // The script will stop when the minimum fitness reaches 0.05
+            ->fitnessThreshold('min', 0.05)
+            // Set the fitness function
+            ->fitnessFunction([$this, 'xorFitnessFunction']);
 
         // Run the algorithm
         $neat->run();
@@ -53,6 +56,7 @@ class NeatTest extends TestCase
                 'output' => 0,
             ],
         ];
+
         // Calculate fitness for all genomes
         foreach ($genomes as &$genome) {
             // Calculate fitness based on expected outputs
