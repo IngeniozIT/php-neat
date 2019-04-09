@@ -1,0 +1,34 @@
+{
+    "name": "ingenioz-it/php-neat",
+    "description": "A PHP implementation of the NeuroEvolution of Augmenting Topologies algorithm.",
+    "keywords": ["NEAT", "NeuroEvolution of Augmenting Topologies", "genetic algorithm", "machine learning"],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "IngeniozIT",
+            "email": "contact@ingenioz.it"
+        }
+    ],
+    "minimum-stability": "dev",
+    "repositories": [
+        { "type": "vcs", "url": "https://github.com/IngeniozIT/php-math.git" }
+    ],
+    "require": {
+        "ingenioz-it/php-math": "^1",
+        "php": ">=7.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "autoload": {
+        "psr-4": {
+            "IngeniozIT\\NEAT\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IngeniozIT\\NEAT\\Tests\\": "tests/"
+        }
+    }
+}
