@@ -105,6 +105,11 @@ class NEAT
 		return $this;
 	}
 
+	public function getFitnessThreshold(): array
+	{
+		return [$this->fitnessCriterion, $this->fitnessThreshold];
+	}
+
 	// fitness function
 
 	protected $fitnessFunction = null;

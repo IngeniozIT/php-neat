@@ -30,6 +30,11 @@ class NeatTest extends TestCase
 
         // Run the algorithm
         $neat->run();
+
+        /**
+         * @todo placeholder test
+         */
+        $this->assertTrue(true);
     }
 
     public function xorFitnessFunction(array &$genomes): void
