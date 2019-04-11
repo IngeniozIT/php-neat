@@ -15,7 +15,7 @@
         { "type": "vcs", "url": "https://github.com/IngeniozIT/php-math.git" }
     ],
     "require": {
-        "ingenioz-it/php-math": "*",
+        "ingenioz-it/php-math": "^1",
         "php": ">=7.2"
     },
     "require-dev": {
