@@ -147,9 +147,7 @@ class NEAT
 
 	public function createGenomePool(): NEAT
 	{
-		/**
-		 * @todo
-		 */
+		$this->genomePool = new GenomePool($this);
 
 		return $this;
 	}
@@ -170,18 +168,14 @@ class NEAT
 
 	public function createGenePool(): NEAT
 	{
-		/**
-		 * @todo
-		 */
+		$this->genePool = new GenePool($this);
 
 		return $this;
 	}
 
-	public function importGenePool(): NEAT
+	public function importGenePool(GenePool &$genePool): NEAT
 	{
-		/**
-		 * @todo
-		 */
+		$this->genePool = $genePool;
 
 		return $this;
 	}
