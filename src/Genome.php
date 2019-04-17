@@ -3,9 +3,11 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\NEAT;
 
+use IngeniozIT\NEAT\Interfaces\GenomeInterface;
+use IngeniozIT\NEAT\Exceptions\GenomeException;
 use IngeniozIT\Math\ActivationFunction;
 
-class Genome
+class Genome implements GenomeInterface
 {
 	protected $inputNodes = [];
 	protected $outputNodes = [];
@@ -23,40 +25,48 @@ class Genome
 
 	// genome building
 
-	protected function addNode(int $id, int $activationFunction, int $aggregationFunction, bool $active)
+	protected function addNode(int $id, int $activationFunction, int $aggregationFunction, bool $active): void
 	{
 		if (!isset($this->activationFunctions[$activationFunction])) {
-			throw new \Exception('Unknown activation function '.$activationFunction);
+			throw new GenomeException('Unknown activation function '.$activationFunction);
 		}
 		if (!isset($this->aggregationFunctions[$aggregationFunction])) {
-			throw new \Exception('Unknown aggregation function '.$aggregationFunction);
+			throw new GenomeException('Unknown aggregation function '.$aggregationFunction);
+		}
+		if ($this->hasNode($id)) {
+			throw new GenomeException('Node "'.$id.'" already exists.');
 		}
 		$this->nodes[$id] = [$activationFunction, $aggregationFunction, $active];
 	}
 
-	public function addInputNode(int $id, int $activationFunction, int $aggregationFunction, bool $active = true)
+	public function addInputNode(int $id, int $activationFunction, int $aggregationFunction, bool $active = true): void
 	{
+		$this->addNode($id, $activationFunction, $aggregationFunction, $active);
 		$this->inputNodes[] = $id;
-		$this->addNode($id, $activationFunction, $aggregationFunction, $active);
 	}
 
-	public function addOutputNode(int $id, int $activationFunction, int $aggregationFunction)
+	public function addOutputNode(int $id, int $activationFunction, int $aggregationFunction): void
 	{
-		$this->outputNodes[] = $id;
 		$this->addNode($id, $activationFunction, $aggregationFunction, true);
+		$this->outputNodes[] = $id;
 	}
 
-	public function addHiddenNode(int $id, int $activationFunction, int $aggregationFunction, bool $active = true)
+	public function addHiddenNode(int $id, int $activationFunction, int $aggregationFunction, bool $active = true): void
 	{
-		$this->hiddenNodes[] = $id;
 		$this->addNode($id, $activationFunction, $aggregationFunction, $active);
+		$this->hiddenNodes[] = $id;
 	}
 
 	protected $connexions = [];
 	protected $connexionNodes = [];
 
-	public function addConnexionGene(int $connexionId, int $inId, int $outId, float $weight)
+	public function addConnexion(int $connexionId, int $inId, int $outId, float $weight): void
 	{
+		if ($this->hasConnexion($connexionId)) {
+			throw new GenomeException('Connexion "'.$connexionId.'" already exists.');
+		}
+		$this->checkNode($inId);
+		$this->checkNode($outId);
 		$this->connexions[$connexionId] = $weight;
 		$this->connexionNodes[$inId][$outId] = $connexionId;
 	}
@@ -66,10 +76,10 @@ class Genome
 		return isset($this->connexions[$connexionId]);
 	}
 
-	public function checkConnexion(int $connexionId)
+	public function checkConnexion(int $connexionId): void
 	{
 		if (!$this->hasConnexion($connexionId)) {
-			throw new \Exception('Connexion "'.$connexionId.'" does not exist.');
+			throw new GenomeException('Connexion "'.$connexionId.'" does not exist.');
 		}
 	}
 
@@ -78,10 +88,10 @@ class Genome
 		return isset($this->nodes[$nodeId]);
 	}
 
-	public function checkNode(int $nodeId)
+	public function checkNode(int $nodeId): void
 	{
 		if (!$this->hasNode($nodeId)) {
-			throw new \Exception('Node "'.$nodeId.'" does not exist.');
+			throw new GenomeException('Node "'.$nodeId.'" does not exist.');
 		}
 	}
 
@@ -93,25 +103,25 @@ class Genome
 		return $this->connexions[$connexionId];
 	}
 
-	public function setConnexionWeight(int $connexionId, float $weight)
+	public function setConnexionWeight(int $connexionId, float $weight): void
 	{
 		$this->checkConnexion($connexionId);
 		$this->connexions[$connexionId] = $weight;
 	}
 
-	public function disableNode(int $nodeId)
+	public function disableNode(int $nodeId): void
 	{
 		$this->checkNode($nodeId);
 		$this->nodes[$nodeId][2] = false;
 	}
 
-	public function enableNode(int $nodeId)
+	public function enableNode(int $nodeId): void
 	{
 		$this->checkNode($nodeId);
 		$this->nodes[$nodeId][2] = true;
 	}
 
-	public function toggleNode(int $nodeId)
+	public function toggleNode(int $nodeId): void
 	{
 		$this->checkNode($nodeId);
 		$this->nodes[$nodeId][2] = !$this->nodes[$nodeId][2];
@@ -119,7 +129,7 @@ class Genome
 
 	// activation
 
-	public function activate(array $inputValues)
+	public function activate(array $inputValues): array
 	{
 		$activations = [];
 		$pendingActivations = [];

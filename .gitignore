@@ -1,6 +1,7 @@
 # IngeniozIT\Math
 
 tmp/
+doc/
 
 # composer
 phpunit.xml
