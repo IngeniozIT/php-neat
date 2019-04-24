@@ -6,6 +6,8 @@ namespace IngeniozIT\NEAT\Tests;
 use PHPUnit\Framework\TestCase;
 
 use IngeniozIT\NEAT\NEAT;
+use IngeniozIT\NEAT\GenePool;
+use IngeniozIT\NEAT\GenomePool;
 
 class ConfigTest extends TestCase
 {
@@ -138,6 +140,24 @@ class ConfigTest extends TestCase
 
         $neat->fullyConnected(true);
         $this->assertTrue($neat->getFullyConnected());
+    }
+
+    public function testGenePool()
+    {
+        $neat = new NEAT();
+        $this->assertNull($neat->getGenePool());
+        $genePool = new GenePool();
+        $neat->importGenePool($genePool);
+        $this->assertSame($genePool, $neat->getGenePool());
+    }
+
+    public function testGenomePool()
+    {
+        $neat = new NEAT();
+        $this->assertNull($neat->getGenePool());
+        $genomePool = new GenomePool();
+        $neat->importGenomePool($genomePool);
+        $this->assertSame($genomePool, $neat->getGenomePool());
     }
 
     public function sampleFitnessFunction(array &$genomes): void

@@ -3,6 +3,9 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\NEAT;
 
+use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
+use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
+
 class NEAT
 {
     // nb inputs
@@ -142,44 +145,44 @@ class NEAT
     // initialization
 
     protected $genomePool = null;
+    protected $genomePoolClass = GenomePool::class;
     protected $genePool = null;
+    protected $genePoolClass = GenePool::class;
 
     public function createGenomePool(): NEAT
     {
-        $this->genomePool = new GenomePool($this);
+        $this->genomePool = new $this->genomePoolClass();
 
         return $this;
     }
 
-    public function importGenomePool(): NEAT
+    public function importGenomePool(GenomePoolInterface &$genomePool): NEAT
     {
-        /**
-         * @todo
-         */
+        $this->genomePool = $genomePool;
 
         return $this;
     }
 
-    public function getGenomePool(): ?GenomePool
+    public function getGenomePool(): ?GenomePoolInterface
     {
         return $this->genomePool;
     }
 
     public function createGenePool(): NEAT
     {
-        $this->genePool = new GenePool($this);
+        $this->genePool = new $this->genePoolClass();
 
         return $this;
     }
 
-    public function importGenePool(GenePool &$genePool): NEAT
+    public function importGenePool(GenePoolInterface &$genePool): NEAT
     {
         $this->genePool = $genePool;
 
         return $this;
     }
 
-    public function getGenePool(): ?GenePool
+    public function getGenePool(): ?GenePoolInterface
     {
         return $this->genePool;
     }
