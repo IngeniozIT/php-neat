@@ -172,6 +172,27 @@ class NEAT
     {
         $this->genePool = new $this->genePoolClass();
 
+        $nbInputs = $this->getNbInputs();
+
+        for ($i = 1; $i <= $nbInputs; ++$i) {
+            $this->genePool->addInputGene();
+        }
+
+        for ($i = 1; $i <= $this->getNbOutputs(); ++$i) {
+            $this->genePool->addOutputGene();
+        }
+
+        if ($this->getFullyConnected()) {
+            $inputGenes = $this->genePool->getInputGenes();
+            $outputGenes = $this->genePool->getOutputGenes();
+
+            foreach ($inputGenes as $inId) {
+                foreach ($outputGenes as $outId) {
+                    $this->genePool->addConnexionGene($inId, $outId);
+                }
+            }
+        }
+
         return $this;
     }
 

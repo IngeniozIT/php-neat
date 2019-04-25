@@ -6,9 +6,63 @@ namespace IngeniozIT\NEAT\Tests;
 use PHPUnit\Framework\TestCase;
 
 use IngeniozIT\NEAT\NEAT;
+use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
 
 class NeatTest extends TestCase
 {
+    public function testFullyConnectedGenePool()
+    {
+        $neat = new NEAT();
+
+        $neat->fullyConnected(true);
+
+        $neat->nbInputs(3);
+        $neat->nbOutputs(2);
+
+        $neat->createGenePool();
+
+        $genePool = $neat->getGenePool();
+
+        $inputGenes = $genePool->getInputGenes();
+        $outputGenes = $genePool->getOutputGenes();
+        $connexionGenes = $genePool->getConnexionGenes();
+
+        $this->assertEquals(3, count($inputGenes));
+        $this->assertEquals(2, count($outputGenes));
+        $this->assertEquals(6, count($connexionGenes));
+
+        foreach ($inputGenes as $inId) {
+            $this->assertTrue($genePool->nodeGeneExists($inId));
+            $this->assertTrue($genePool->nodeGeneExists($inId, GenePoolInterface::NODE_INPUT));
+            foreach ($outputGenes as $outId) {
+                $this->assertEquals([$inId, $outId], $connexionGenes[$genePool->getConnexionGeneId($inId, $outId)]);
+            }
+        }
+        foreach ($outputGenes as $outId) {
+            $this->assertTrue($genePool->nodeGeneExists($outId));
+            $this->assertTrue($genePool->nodeGeneExists($outId, GenePoolInterface::NODE_OUTPUT));
+        }
+        $this->assertEquals(6, count($genePool->getConnexionGenes()));
+    }
+
+    public function testFSGenePool()
+    {
+        $neat = new NEAT();
+
+        $neat->fullyConnected(false);
+
+        $neat->nbInputs(3);
+        $neat->nbOutputs(2);
+
+        $neat->createGenePool();
+
+        $genePool = $neat->getGenePool();
+
+        $this->assertEquals(3, count($genePool->getInputGenes()));
+        $this->assertEquals(2, count($genePool->getOutputGenes()));
+        $this->assertEquals(0, count($genePool->getConnexionGenes()));
+    }
+
     public function testXor()
     {
         $neat = new NEAT();
