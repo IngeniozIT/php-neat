@@ -5,6 +5,9 @@ namespace IngeniozIT\NEAT;
 
 use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
 use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
+use IngeniozIT\NEAT\Exceptions\NeatException;
+use IngeniozIT\Math\ActivationFunction;
+use IngeniozIT\Math\Random;
 
 class NEAT
 {
@@ -148,10 +151,49 @@ class NEAT
     protected $genomePoolClass = GenomePool::class;
     protected $genePool = null;
     protected $genePoolClass = GenePool::class;
+    protected $genomeClass = Genome::class;
 
     public function createGenomePool(): NEAT
     {
         $this->genomePool = new $this->genomePoolClass();
+
+        $genePool = $this->getGenePool();
+        if (null === $genePool) {
+            $this->createGenePool();
+            $genePool = $this->getGenePool();
+        }
+
+        $inputGenes = $genePool->getInputGenes();
+        $outputGenes = $genePool->getOutputGenes();
+
+        $populationSize = $this->getPopulationSize();
+
+        for ($i = 1; $i <= $populationSize; ++$i) {
+            $genome = new $this->genomeClass(['ActivationFunction::sigmoid'], ['array_sum']);
+
+            foreach ($inputGenes as $inId) {
+                $genome->addinputNode($inId, 0, 0);
+            }
+
+            foreach ($outputGenes as $outId) {
+                $genome->addOutputNode($outId, 0, 0);
+            }
+
+            if ($this->getFullyConnected()) {
+                foreach ($inputGenes as $inId) {
+                    foreach ($outputGenes as $outId) {
+                        $genome->addConnexion(
+                            $genePool->getConnexionGeneId($inId, $outId),
+                            $inId,
+                            $outId,
+                            Random::nrand(0, 1)
+                        );
+                    }
+                }
+            }
+
+            $this->genomePool->addGenome($genome);
+        }
 
         return $this;
     }
@@ -173,12 +215,20 @@ class NEAT
         $this->genePool = new $this->genePoolClass();
 
         $nbInputs = $this->getNbInputs();
+        if (null === $nbInputs) {
+            throw new NeatException('No number of inputs specified.');
+        }
+
+        $nbOutputs = $this->getNbOutputs();
+        if (null === $nbOutputs) {
+            throw new NeatException('No number of outputs specified.');
+        }
 
         for ($i = 1; $i <= $nbInputs; ++$i) {
             $this->genePool->addInputGene();
         }
 
-        for ($i = 1; $i <= $this->getNbOutputs(); ++$i) {
+        for ($i = 1; $i <= $nbOutputs; ++$i) {
             $this->genePool->addOutputGene();
         }
 

@@ -10,6 +10,26 @@ use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
 
 class NeatTest extends TestCase
 {
+    public function testGenePoolNoInputsNumber()
+    {
+        $neat = new NEAT();
+
+        $neat->nbOutputs(2);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
+        $neat->createGenePool();
+    }
+
+    public function testGenePoolNoOutputsNumber()
+    {
+        $neat = new NEAT();
+
+        $neat->nbInputs(3);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
+        $neat->createGenePool();
+    }
+
     public function testFullyConnectedGenePool()
     {
         $neat = new NEAT();
@@ -61,6 +81,60 @@ class NeatTest extends TestCase
         $this->assertEquals(3, count($genePool->getInputGenes()));
         $this->assertEquals(2, count($genePool->getOutputGenes()));
         $this->assertEquals(0, count($genePool->getConnexionGenes()));
+    }
+
+    public function testGenomePoolNoInputsNumber()
+    {
+        $neat = new NEAT();
+
+        $neat->nbOutputs(2);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
+        $neat->createGenomePool();
+    }
+
+    public function testGenomePoolNoOutputsNumber()
+    {
+        $neat = new NEAT();
+
+        $neat->nbInputs(3);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
+        $neat->createGenomePool();
+    }
+
+    public function testFullyConnectedGenomePool()
+    {
+        $neat = new NEAT();
+
+        $neat->fullyConnected(true);
+
+        $neat->nbInputs(3);
+        $neat->nbOutputs(2);
+        $neat->populationSize(3);
+
+        $neat->createGenomePool();
+
+        $genePool = $neat->getGenePool();
+        $inputGenes = $genePool->getInputGenes();
+        $outputGenes = $genePool->getOutputGenes();
+        $connexionGenes = $genePool->getConnexionGenes();
+
+        $genomes = $neat->getGenomePool()->getGenomes();
+
+        $this->assertEquals(3, count($genomes));
+
+        foreach ($genomes as $genome) {
+            foreach ($inputGenes as $inId) {
+                $this->assertTrue($genome->hasNode($inId));
+            }
+            foreach ($outputGenes as $outId) {
+                $this->assertTrue($genome->hasNode($outId));
+            }
+            foreach ($connexionGenes as $connId => $connexion) {
+                $this->assertTrue($genome->hasConnexion($connId));
+            }
+        }
     }
 
     public function testXor()
@@ -119,7 +193,7 @@ class NeatTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function xorFitnessFunction(array &$genomes): void
+    public function xorFitnessFunction(iterable &$genomes): void
     {
         $trainingData = [
             [
