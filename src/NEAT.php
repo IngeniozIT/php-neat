@@ -8,6 +8,7 @@ use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
 use IngeniozIT\NEAT\Exceptions\NeatException;
 use IngeniozIT\Math\ActivationFunction;
 use IngeniozIT\Math\Random;
+use IngeniozIT\Math\KMeans;
 
 class NEAT
 {
@@ -169,7 +170,7 @@ class NEAT
         $populationSize = $this->getPopulationSize();
 
         for ($i = 1; $i <= $populationSize; ++$i) {
-            $genome = new $this->genomeClass(['ActivationFunction::sigmoid'], ['array_sum']);
+            $genome = new $this->genomeClass([[ActivationFunction::class, 'sigmoid']], ['array_sum']);
 
             foreach ($inputGenes as $inId) {
                 $genome->addinputNode($inId, 0, 0);
@@ -299,17 +300,23 @@ class NEAT
         }
     }
 
+    protected $species = [];
+
     protected function speciation()
     {
-        /**
-         * @todo
-         */
+        $genomes = $this->getGenomePool()->getVectors();
+        $kMeans = new KMeans($genomes);
+        while (!$kMeans->classifyAndOptimize()) {
+        }
+        $this->species = $kMeans->clusters();
     }
 
     protected function evaluation()
     {
+        $genomes = $this->getGenomePool()->getGenomes();
+        $this->getFitnessFunction()($genomes);
         /**
-         * @todo
+         * @todo Test if all genomes have a fitness
          */
     }
 

@@ -222,11 +222,11 @@ class NeatTest extends TestCase
         foreach ($genomes as &$genome) {
             // Calculate fitness based on expected outputs
             $fitness = 0;
-            foreach ($this->trainingData as $trainingSample) {
+            foreach ($trainingData as $trainingSample) {
                 // Compute the output
                 $output = $genome->activate($trainingSample['input']);
                 // Compute the difference between output and expected value
-                $fitness += abs($expectedValue - $trainingSample['output']);
+                $fitness += abs($output[0] - $trainingSample['output']);
             }
 
             // $fitness is now equal to the sum of errors for all training data

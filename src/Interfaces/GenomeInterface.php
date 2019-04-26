@@ -115,4 +115,10 @@ interface GenomeInterface
      * @return float[] The list of output values.
      */
     public function activate(array $inputValues): array;
+
+    public function getVector(): array;
+
+    public function setFitness(float $fitness): void;
+
+    public function getFitness(): ?float;
 }

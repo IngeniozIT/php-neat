@@ -8,4 +8,6 @@ interface GenomePoolInterface
     public function addGenome(GenomeInterface &$genome): GenomePoolInterface;
 
     public function getGenomes(): array;
+
+    public function getVectors(): array;
 }

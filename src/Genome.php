@@ -187,4 +187,21 @@ class Genome implements GenomeInterface
 
         return $outputs;
     }
+
+    public function getVector(): array
+    {
+        return $this->connexions;
+    }
+
+    protected $fitness = null;
+
+    public function setFitness(float $fitness): void
+    {
+        $this->fitness = $fitness;
+    }
+
+    public function getFitness(): ?float
+    {
+        return $this->fitness;
+    }
 }

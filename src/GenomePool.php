@@ -21,4 +21,14 @@ class GenomePool implements GenomePoolInterface
     {
         return $this->genomes;
     }
+
+    public function getVectors(): array
+    {
+        return array_map([$this, 'genomeToVector'], $this->getGenomes());
+    }
+
+    protected function genomeToVector(GenomeInterface $genome): array
+    {
+        return $genome->getVector();
+    }
 }

@@ -112,6 +112,46 @@ class GenomeTest extends TestCase
         $genome->checkNode(42);
     }
 
+    public function testGetVector()
+    {
+        $genome = new $this->className([
+            0 => [ActivationFunction::class, 'identity'],
+        ], [
+            0 => 'array_sum',
+        ]);
+
+        $genome->addInputNode(1, 0, 0);
+        $genome->addHiddenNode(2, 0, 0);
+        $genome->addHiddenNode(3, 0, 0);
+        $genome->addHiddenNode(4, 0, 0);
+        $genome->addOutputNode(5, 0, 0);
+
+        $genome->addConnexion(1, 1, 2, 1);
+        $genome->addConnexion(2, 2, 3, 500);
+        $genome->addConnexion(3, 3, 4, -2000);
+        $genome->addConnexion(4, 4, 5, 42);
+
+        $this->assertEquals([
+            1 => 1,
+            2 => 500,
+            3 => -2000,
+            4 => 42,
+        ], $genome->getVector());
+    }
+
+    public function testFitness()
+    {
+        $genome = new $this->className([
+            0 => [ActivationFunction::class, 'identity'],
+        ], [
+            0 => 'array_sum',
+        ]);
+
+        $this->assertNull($genome->getFitness());
+        $genome->setFitness(42.42);
+        $this->assertEquals(42.42, $genome->getFitness());
+    }
+
     public function testSnakeNetwork()
     {
         $genome = new $this->className([
