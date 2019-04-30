@@ -13,7 +13,7 @@ interface GenomePoolInterface
 
     public function getSpecies(): array;
 
-    public function assigneGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface;
+    public function assignGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface;
 
     public function resetSpecies(): GenomePoolInterface;
 }

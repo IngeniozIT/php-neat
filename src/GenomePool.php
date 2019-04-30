@@ -49,7 +49,7 @@ class GenomePool implements GenomePoolInterface
         return $this->species;
     }
 
-    public function assigneGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface
+    public function assignGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface
     {
         foreach ($genomesId as $genomeId) {
             $this->genomes[$genomeId]->setSpecies($speciesId);

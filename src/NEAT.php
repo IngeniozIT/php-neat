@@ -317,7 +317,7 @@ class NEAT
         $species = $kMeans->clusters();
 
         foreach ($species as $speciesId => $gens) {
-            $genomePool->assigneGenomesToSpecies($gens, $speciesId);
+            $genomePool->assignGenomesToSpecies($gens, $speciesId);
         }
 
         $this->speciated = true;
