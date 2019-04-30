@@ -206,7 +206,7 @@ class NEAT
         return $this;
     }
 
-    public function getGenomePool(): ?GenomePoolInterface
+    public function &getGenomePool(): ?GenomePoolInterface
     {
         return $this->genomePool;
     }
@@ -254,7 +254,7 @@ class NEAT
         return $this;
     }
 
-    public function getGenePool(): ?GenePoolInterface
+    public function &getGenePool(): ?GenePoolInterface
     {
         return $this->genePool;
     }

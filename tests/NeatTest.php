@@ -165,34 +165,6 @@ class NeatTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testMultipleXor()
-    {
-        $neat = new NEAT();
-
-        // Create a genome pool with 50 genomes having 2 inputs and 1 output
-        $neat
-            ->nbInputs(2)
-            ->nbOutputs(1)
-            ->populationSize(50);
-
-        // Evaluation settings
-        $neat
-            // The script should run for 100 generations max
-            ->maxGenerations(100)
-            // The script will stop when the minimum fitness reaches 0.05
-            ->fitnessThreshold('min', 0.05)
-            // Set the fitness function
-            ->fitnessFunction([$this, 'xorFitnessFunction']);
-
-        // Run the algorithm
-        $neat->run();
-
-        /**
-         * @todo placeholder test
-         */
-        $this->assertTrue(true);
-    }
-
     public function xorFitnessFunction(iterable &$genomes): void
     {
         $trainingData = [

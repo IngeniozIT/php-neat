@@ -17,7 +17,7 @@ class GenomePool implements GenomePoolInterface
         return $this;
     }
 
-    public function getGenomes(): array
+    public function &getGenomes(): array
     {
         return $this->genomes;
     }
