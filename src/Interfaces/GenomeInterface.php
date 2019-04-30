@@ -121,4 +121,8 @@ interface GenomeInterface
     public function setFitness(float $fitness): void;
 
     public function getFitness(): ?float;
+
+    public function setSpecies(?int $species): void;
+
+    public function getSpecies(): ?int;
 }

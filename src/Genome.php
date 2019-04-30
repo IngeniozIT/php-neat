@@ -195,7 +195,7 @@ class Genome implements GenomeInterface
 
     protected $fitness = null;
 
-    public function setFitness(float $fitness): void
+    public function setFitness(?float $fitness): void
     {
         $this->fitness = $fitness;
     }
@@ -203,5 +203,17 @@ class Genome implements GenomeInterface
     public function getFitness(): ?float
     {
         return $this->fitness;
+    }
+
+    protected $species = null;
+
+    public function setSpecies(?int $species): void
+    {
+        $this->species = $species;
+    }
+
+    public function getSpecies(): ?int
+    {
+        return $this->species;
     }
 }

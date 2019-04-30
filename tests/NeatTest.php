@@ -145,12 +145,12 @@ class NeatTest extends TestCase
         $neat
             ->nbInputs(2)
             ->nbOutputs(1)
-            ->populationSize(50);
+            ->populationSize(10);
 
         // Evaluation settings
         $neat
             // The script should run for 100 generations max
-            ->maxGenerations(100)
+            ->maxGenerations(2)
             // The script will stop when the minimum fitness reaches 0.05
             ->fitnessThreshold('min', 0.05)
             // Set the fitness function
@@ -158,7 +158,6 @@ class NeatTest extends TestCase
 
         // Run the algorithm
         $neat->run();
-
         /**
          * @todo placeholder test
          */
