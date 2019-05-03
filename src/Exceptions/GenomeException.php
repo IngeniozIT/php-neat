@@ -5,6 +5,6 @@ namespace IngeniozIT\NEAT\Exceptions;
 
 use Exception;
 
-class GenomeException extends Exception
+class GenomeException extends NeatException
 {
 }

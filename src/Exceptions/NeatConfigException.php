@@ -5,6 +5,6 @@ namespace IngeniozIT\NEAT\Exceptions;
 
 use Exception;
 
-class GenePoolException extends NeatException
+class NeatConfigException extends NeatException
 {
 }
