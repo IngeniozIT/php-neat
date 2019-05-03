@@ -4,15 +4,19 @@ declare(strict_types = 1);
 namespace IngeniozIT\NEAT;
 
 use IngeniozIT\NEAT\NeatConfig;
+use IngeniozIT\NEAT\Interfaces\NeatInterface;
+
 use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
 use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
 use IngeniozIT\NEAT\Interfaces\NeatConfigInterface;
+
 use IngeniozIT\NEAT\Exceptions\NeatException;
+
 use IngeniozIT\Math\ActivationFunction;
 use IngeniozIT\Math\Random;
 use IngeniozIT\Math\KMeans;
 
-class NEAT extends NeatConfig
+class NEAT extends NeatConfig implements NeatInterface
 {
     // current generation
 

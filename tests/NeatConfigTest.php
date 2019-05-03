@@ -14,13 +14,13 @@ use IngeniozIT\Math\ActivationFunction;
 
 class NeatConfigTest extends TestCase
 {
-    protected $neatClass = NEAT::class;
+    protected $classname = NEAT::class;
 
     public function testConstruct()
     {
-        $neat = new $this->neatClass();
+        $neat = new $this->classname();
 
-        $this->assertInstanceOf($this->neatClass, $neat);
+        $this->assertInstanceOf($this->classname, $neat);
 
         return $neat;
     }
@@ -63,12 +63,12 @@ class NeatConfigTest extends TestCase
 
     public function testAutoPopulationSize()
     {
-        $neat = new $this->neatClass();
+        $neat = new $this->classname();
         $neat->nbInputs(20);
         $neat->nbOutputs(10);
         $this->assertEquals($neat->getPopulationSize(), 400);
 
-        $neat = new $this->neatClass();
+        $neat = new $this->classname();
         $neat->nbOutputs(10);
         $neat->nbInputs(20);
         $this->assertEquals($neat->getPopulationSize(), 400);

@@ -152,6 +152,19 @@ class GenomeTest extends TestCase
         $this->assertEquals(42.42, $genome->getFitness());
     }
 
+    public function testSpecies()
+    {
+        $genome = new $this->className([
+            0 => [ActivationFunction::class, 'identity'],
+        ], [
+            0 => 'array_sum',
+        ]);
+
+        $this->assertNull($genome->getSpecies());
+        $genome->setSpecies(42);
+        $this->assertEquals(42, $genome->getSpecies());
+    }
+
     public function testSnakeNetwork()
     {
         $genome = new $this->className([

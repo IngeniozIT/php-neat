@@ -116,13 +116,33 @@ interface GenomeInterface
      */
     public function activate(array $inputValues): array;
 
+    /**
+     * Get the vector representation of the genome.
+     * @return array The vector.
+     */
     public function getVector(): array;
 
+    /**
+     * Set the fitness of the genome.
+     * @param float $fitness The fitness.
+     */
     public function setFitness(float $fitness): void;
 
+    /**
+     * Get the fitness of the genome.
+     * @return float|null The fitness of the genome.
+     */
     public function getFitness(): ?float;
 
+    /**
+     * Set the species of the genome.
+     * @param int|null $species The species.
+     */
     public function setSpecies(?int $species): void;
 
+    /**
+     * Get the species of the genome.
+     * @return int|null The species of the genome.
+     */
     public function getSpecies(): ?int;
 }
