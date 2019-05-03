@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 use IngeniozIT\NEAT\NEAT;
 use IngeniozIT\NEAT\Interfaces\NeatConfigInterface;
+use IngeniozIT\NEAT\Genome;
 use IngeniozIT\NEAT\GenePool;
 use IngeniozIT\NEAT\GenomePool;
 use IngeniozIT\Math\ActivationFunction;
@@ -58,6 +59,19 @@ class NeatConfigTest extends TestCase
 
         $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
         $neat->populationSize(0);
+    }
+
+    public function testAutoPopulationSize()
+    {
+        $neat = new $this->neatClass();
+        $neat->nbInputs(20);
+        $neat->nbOutputs(10);
+        $this->assertEquals($neat->getPopulationSize(), 400);
+
+        $neat = new $this->neatClass();
+        $neat->nbOutputs(10);
+        $neat->nbInputs(20);
+        $this->assertEquals($neat->getPopulationSize(), 400);
     }
 
     /**
@@ -210,6 +224,9 @@ class NeatConfigTest extends TestCase
     {
         $neat->weightMinValue(-42.42);
         $this->assertEquals($neat->getWeightMinValue(), -42.42);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->weightMinValue($neat->getWeightMaxValue() + 0.1);
     }
 
     /**
@@ -219,19 +236,69 @@ class NeatConfigTest extends TestCase
     {
         $neat->weightMaxValue(42.42);
         $this->assertEquals($neat->getWeightMaxValue(), 42.42);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->weightMaxValue($neat->getWeightMinValue() - 0.1);
     }
 
-    public function testAutoPopulationSize()
+    /**
+     * @depends testConstruct
+     */
+    public function testGenomeClass(NeatConfigInterface $neat)
     {
-        $neat = new $this->neatClass();
-        $neat->nbInputs(20);
-        $neat->nbOutputs(10);
-        $this->assertEquals($neat->getPopulationSize(), 400);
+        $neat->genomeClass(Genome::class);
+        $this->assertEquals($neat->getGenomeClass(), Genome::class);
+        /**
+         * @todo check if callable has right parameters
+         */
 
-        $neat = new $this->neatClass();
-        $neat->nbOutputs(10);
-        $neat->nbInputs(20);
-        $this->assertEquals($neat->getPopulationSize(), 400);
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->genomeClass('NullClass');
+    }
+
+    /**
+     * @depends testConstruct
+     */
+    public function testGenomePoolClass(NeatConfigInterface $neat)
+    {
+        $neat->genomePoolClass(GenomePool::class);
+        $this->assertEquals($neat->getGenomePoolClass(), GenomePool::class);
+        /**
+         * @todo check if callable has right parameters
+         */
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->genomePoolClass('NullClass');
+    }
+
+    /**
+     * @depends testConstruct
+     */
+    public function testGenePoolClass(NeatConfigInterface $neat)
+    {
+        $neat->genePoolClass(GenePool::class);
+        $this->assertEquals($neat->getGenePoolClass(), GenePool::class);
+        /**
+         * @todo check if callable has right parameters
+         */
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->genePoolClass('NullClass');
+    }
+
+    /**
+     * @depends testConstruct
+     */
+    public function testValidateConfig(NeatConfigInterface $neat)
+    {
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(1)
+            ->populationSize(50)
+            ->maxGenerations(100);
+
+        $neat->validateConfig();
+        $this->assertTrue(true);
     }
 
     public function sampleFitnessFunction(array &$genomes): void

@@ -300,10 +300,12 @@ abstract class NeatConfig implements NeatConfigInterface
     public function genomeClass(string $className): NeatConfigInterface
     {
         if (!class_exists($className)) {
-            throw new NeatConfigException('Genome class "'+$className+'" does not exist.');
+            throw new NeatConfigException('Genome class "'.$className.'" does not exist.');
         }
 
         $this->config['genome_class'] = $className;
+
+        return $this;
     }
 
     public function getGenomeClass(): string
@@ -314,10 +316,12 @@ abstract class NeatConfig implements NeatConfigInterface
     public function genomePoolClass(string $className): NeatConfigInterface
     {
         if (!class_exists($className)) {
-            throw new NeatConfigException('Genome pool class "'+$className+'" does not exist.');
+            throw new NeatConfigException('Genome pool class "'.$className.'" does not exist.');
         }
 
         $this->config['genome_pool_class'] = $className;
+
+        return $this;
     }
 
     public function getGenomePoolClass(): string
@@ -328,10 +332,12 @@ abstract class NeatConfig implements NeatConfigInterface
     public function genePoolClass(string $className): NeatConfigInterface
     {
         if (!class_exists($className)) {
-            throw new NeatConfigException('Gene pool class "'+$className+'" does not exist.');
+            throw new NeatConfigException('Gene pool class "'.$className.'" does not exist.');
         }
 
         $this->config['gene_pool_class'] = $className;
+
+        return $this;
     }
 
     public function getGenePoolClass(): string
