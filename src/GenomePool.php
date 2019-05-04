@@ -32,28 +32,24 @@ class GenomePool implements GenomePoolInterface
 
     public function removeGenome(int $genomeId): GenomePoolInterface
     {
-        $speciesId = $this->genomes[$genomeId]->getSpecies();
-        if (isset($this->species[$speciesId][$genomeId])) {
-            unset($this->species[$this->genomes[$genomeId]->getSpecies()][$genomeId]);
-        }
+        $this->assignGenomesToSpecies([$genomeId], null);
         unset($this->genomes[$genomeId]);
 
         return $this;
     }
 
-    public function &getGenomes(): array
+    public function &genomes(): array
     {
         return $this->genomes;
     }
 
     public function getVectors(): array
     {
-        return array_map([$this, 'genomeToVector'], $this->getGenomes());
-    }
-
-    protected function genomeToVector(GenomeInterface $genome): array
-    {
-        return $genome->getVector();
+        $vects = [];
+        foreach ($this->getGenomes() as $genomeId => $genome) {
+            $vects[$genomeId] = $genome->getVector();
+        }
+        return $vects;
     }
 
     public function getSpecies(): array
@@ -61,11 +57,31 @@ class GenomePool implements GenomePoolInterface
         return $this->species;
     }
 
-    public function assignGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface
+    public function assignGenomesToSpecies(array $genomesId, ?int $speciesId): GenomePoolInterface
     {
         foreach ($genomesId as $genomeId) {
+            $currentSpeciesId = $this->genomes[$genomeId]->getSpecies();
+
+            // Genome previously had a species
+            if (null !== $currentSpeciesId) {
+                unset($this->species[$currentSpeciesId][array_search($genomeId, $this->species[$currentSpeciesId])]);
+                // Remove species if empty
+                if (empty($this->species[$currentSpeciesId])) {
+                    unset($this->species[$currentSpeciesId]);
+                }
+            }
+
+            // Set genome species
             $this->genomes[$genomeId]->setSpecies($speciesId);
-            $this->species[$speciesId][] = $genomeId;
+            if (null !== $speciesId) {
+                $this->species[$speciesId][] = $genomeId;
+            }
+        }
+
+        // Sort species
+        if (null !== $speciesId) {
+            sort($this->species[$speciesId]);
+            ksort($this->species);
         }
 
         return $this;

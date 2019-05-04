@@ -11,13 +11,13 @@ interface GenomePoolInterface
 
     public function addGenome(GenomeInterface &$genome): GenomePoolInterface;
 
-    public function &getGenomes(): array;
+    public function &genomes(): array;
 
     public function getVectors(): array;
 
     public function getSpecies(): array;
 
-    public function assignGenomesToSpecies(array $genomesId, int $speciesId): GenomePoolInterface;
+    public function assignGenomesToSpecies(array $genomesId, ?int $speciesId): GenomePoolInterface;
 
     public function resetSpecies(): GenomePoolInterface;
 }
