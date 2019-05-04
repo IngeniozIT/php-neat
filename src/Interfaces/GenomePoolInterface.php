@@ -5,9 +5,13 @@ namespace IngeniozIT\NEAT\Interfaces;
 
 interface GenomePoolInterface
 {
+    public function __construct(GenePoolInterface $genePool);
+
+    public function &getGenePool(): GenePoolInterface;
+
     public function addGenome(GenomeInterface &$genome): GenomePoolInterface;
 
-    public function getGenomes(): array;
+    public function &getGenomes(): array;
 
     public function getVectors(): array;
 

@@ -4,12 +4,24 @@ declare(strict_types = 1);
 namespace IngeniozIT\NEAT;
 
 use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
+use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
 use IngeniozIT\NEAT\Interfaces\GenomeInterface;
 
 class GenomePool implements GenomePoolInterface
 {
+    protected $genePool;
     protected $genomes = [];
     protected $species = [];
+
+    public function __construct(GenePoolInterface $genePool)
+    {
+        $this->genePool = $genePool;
+    }
+
+    public function &getGenePool(): GenePoolInterface
+    {
+        return $this->genePool;
+    }
 
     public function addGenome(GenomeInterface &$genome): GenomePoolInterface
     {

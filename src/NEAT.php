@@ -18,7 +18,7 @@ use IngeniozIT\Math\KMeans;
 
 class NEAT extends NeatConfig implements NeatInterface
 {
-    // current generation
+    // Current generation
 
     protected $currentGeneration = 0;
 
@@ -27,9 +27,43 @@ class NEAT extends NeatConfig implements NeatInterface
         return $this->currentGeneration;
     }
 
-    // initialization
+    // Initialization
 
     protected $genomePool = null;
+
+    public function setPool(GenomePoolInterface &$pool): NeatInterface
+    {
+        $this->genomePool = $pool;
+
+        return $this;
+    }
+
+    public function &getPool(): GenomePoolInterface
+    {
+        if (null === $this->genomePool) {
+            $this->createPool();
+        }
+
+        return $this->genomePool;
+    }
+
+    public function createPool(): NeatInterface
+    {
+        $this->validatePoolCreation();
+
+        $genePoolClass = $this->getGenePoolClass();
+        $genomePoolClass = $this->getGenomePoolClass();
+
+        $genePool = new $genePoolClass();
+        $genomePool = new $genomePoolClass($genePool);
+
+        $this->setPool($genomePool);
+
+        return $this;
+    }
+
+
+
     protected $genePool = null;
 
     public function importGenomePool(GenomePoolInterface &$genomePool): NEAT

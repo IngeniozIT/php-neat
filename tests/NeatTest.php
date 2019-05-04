@@ -6,37 +6,77 @@ namespace IngeniozIT\NEAT\Tests;
 use PHPUnit\Framework\TestCase;
 
 use IngeniozIT\NEAT\NEAT;
-use IngeniozIT\NEAT\Interfaces\GenePoolInterface;
+use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
+use IngeniozIT\NEAT\GenomePool;
+use IngeniozIT\NEAT\GenePool;
 
 class NeatTest extends TestCase
 {
-    protected $neatClass = NEAT::class;
+    protected $className = NEAT::class;
 
-    public function testSample()
+    public function testCreatePoolNoInputsNumber()
     {
-        $this->assertTrue(true);
+        $neat = new $this->className();
+
+        $neat
+            ->nbOutputs(2)
+            ->populationSize(10);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->createPool();
+    }
+
+    public function testCreatePoolNoOutputsNumber()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->populationSize(10);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatConfigException::class);
+        $neat->createPool();
+    }
+
+    public function testSetPool()
+    {
+        $neat = new $this->className();
+
+        $genomePool = new GenomePool(new GenePool());
+
+        $neat
+            ->nbInputs(3)
+            ->populationSize(10)
+            ->setPool($genomePool);
+
+        $this->assertSame($genomePool, $neat->getPool());
+    }
+
+    public function testCreatePool()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(10)
+            ->createPool();
+
+        $this->assertInstanceOf(GenomePoolInterface::class, $neat->getPool());
+    }
+
+    public function testGetPool()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(10);
+
+        $this->assertInstanceOf(GenomePoolInterface::class, $neat->getPool());
     }
 /*
-    public function testGenePoolNoInputsNumber()
-    {
-        $neat = new NEAT();
-
-        $neat->nbOutputs(2);
-
-        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
-        $neat->createGenePool();
-    }
-
-    public function testGenePoolNoOutputsNumber()
-    {
-        $neat = new NEAT();
-
-        $neat->nbInputs(3);
-
-        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
-        $neat->createGenePool();
-    }
-
     public function testFullyConnectedGenePool()
     {
         $neat = new NEAT();
@@ -46,7 +86,6 @@ class NeatTest extends TestCase
         $neat->nbInputs(3);
         $neat->nbOutputs(2);
 
-        $neat->prepareRun();
         $genePool = $neat->getGenePool();
 
         $inputGenes = $genePool->getInputGenes();

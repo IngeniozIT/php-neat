@@ -64,13 +64,15 @@ class NeatConfigTest extends TestCase
     public function testAutoPopulationSize()
     {
         $neat = new $this->classname();
-        $neat->nbInputs(20);
-        $neat->nbOutputs(10);
+        $neat
+            ->nbInputs(20)
+            ->nbOutputs(10);
         $this->assertEquals($neat->getPopulationSize(), 400);
 
         $neat = new $this->classname();
-        $neat->nbOutputs(10);
-        $neat->nbInputs(20);
+        $neat
+            ->nbOutputs(10)
+            ->nbInputs(20);
         $this->assertEquals($neat->getPopulationSize(), 400);
     }
 
@@ -81,6 +83,7 @@ class NeatConfigTest extends TestCase
     {
         $neat->maxGenerations(42);
         $this->assertEquals($neat->getMaxGenerations(), 42);
+
         $neat->maxGenerations(0);
         $this->assertEquals($neat->getMaxGenerations(), 0);
 
@@ -158,8 +161,9 @@ class NeatConfigTest extends TestCase
             [ActivationFunction::class, 'sigmoid'],
             [ActivationFunction::class, 'identity'],
         ];
-        $neat->activationFunctions($functions);
-        $neat->defaultActivationFunction(1);
+        $neat
+            ->activationFunctions($functions)
+            ->defaultActivationFunction(1);
         $this->assertSame($neat->getDefaultActivationFunction(), 1);
         /**
          * @todo check if callable has right parameters
@@ -191,8 +195,9 @@ class NeatConfigTest extends TestCase
             'array_sum',
             'array_product',
         ];
-        $neat->aggregationFunctions($functions);
-        $neat->defaultAggregationFunction(1);
+        $neat
+            ->aggregationFunctions($functions)
+            ->defaultAggregationFunction(1);
         $this->assertSame($neat->getDefaultAggregationFunction(), 1);
         /**
          * @todo check if callable has right parameters
@@ -289,15 +294,26 @@ class NeatConfigTest extends TestCase
     /**
      * @depends testConstruct
      */
+    public function testValidatePoolCreation(NeatConfigInterface $neat)
+    {
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(1)
+            ->populationSize(50);
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @depends testConstruct
+     */
     public function testValidateConfig(NeatConfigInterface $neat)
     {
         $neat
             ->nbInputs(3)
             ->nbOutputs(1)
             ->populationSize(50)
-            ->maxGenerations(100);
-
-        $neat->validateConfig();
+            ->maxGenerations(100)
+            ->validateConfig();
         $this->assertTrue(true);
     }
 

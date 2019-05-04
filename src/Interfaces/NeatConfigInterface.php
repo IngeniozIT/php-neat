@@ -90,5 +90,6 @@ interface NeatConfigInterface
 
     // Validation
 
+    public function validatePoolCreation(): void;
     public function validateConfig(): void;
 }

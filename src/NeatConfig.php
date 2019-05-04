@@ -347,6 +347,14 @@ abstract class NeatConfig implements NeatConfigInterface
 
     // Validation
 
+    public function validatePoolCreation(): void
+    {
+        $this
+            ->nbInputs($this->getNbInputs())
+            ->nbOutputs($this->getNbOutputs())
+            ->populationSize($this->getPopulationSize());
+    }
+
     public function validateConfig(): void
     {
         $this
