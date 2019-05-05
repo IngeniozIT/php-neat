@@ -9,6 +9,9 @@ use IngeniozIT\NEAT\Genome;
 use IngeniozIT\NEAT\Interfaces\GenomeInterface;
 use IngeniozIT\Math\ActivationFunction;
 
+/**
+ * @coversDefaultClass \IngeniozIT\NEAT\Genome
+ */
 class GenomeTest extends TestCase
 {
     protected $className = Genome::class;
@@ -16,28 +19,34 @@ class GenomeTest extends TestCase
     public function testBadActivationFunction()
     {
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
-        $genome = new $this->className([], [
+        $genome = new $this->className(
+            [], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
         $genome->addInputNode(1, 0, 0);
     }
 
     public function testBadAggregationFunction()
     {
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], []);
+            ], []
+        );
         $genome->addInputNode(1, 0, 0);
     }
 
     public function testAddExistingConnexion()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $genome->addOutputNode(2, 0, 0);
@@ -49,11 +58,13 @@ class GenomeTest extends TestCase
 
     public function testHasConnexion()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
         $genome->addInputNode(1, 0, 0);
         $genome->addOutputNode(2, 0, 0);
         $genome->addConnexion(42, 1, 2, 1);
@@ -64,11 +75,13 @@ class GenomeTest extends TestCase
 
     public function testCheckConnexion()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
         $genome->checkConnexion(42);
@@ -76,11 +89,13 @@ class GenomeTest extends TestCase
 
     public function testAddExistingNode()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
@@ -89,11 +104,13 @@ class GenomeTest extends TestCase
 
     public function testHasNode()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
         $genome->addInputNode(42, 0, 0);
 
         $this->assertTrue($genome->hasNode(42));
@@ -102,11 +119,13 @@ class GenomeTest extends TestCase
 
     public function testCheckNode()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
         $genome->checkNode(42);
@@ -114,11 +133,13 @@ class GenomeTest extends TestCase
 
     public function testGetVector()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $genome->addHiddenNode(2, 0, 0);
@@ -131,21 +152,25 @@ class GenomeTest extends TestCase
         $genome->addConnexion(3, 3, 4, -2000);
         $genome->addConnexion(4, 4, 5, 42);
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             1 => 1,
             2 => 500,
             3 => -2000,
             4 => 42,
-        ], $genome->getVector());
+            ], $genome->getVector()
+        );
     }
 
     public function testFitness()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $this->assertNull($genome->getFitness());
         $genome->setFitness(42.42);
@@ -154,11 +179,13 @@ class GenomeTest extends TestCase
 
     public function testSpecies()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $this->assertNull($genome->getSpecies());
         $genome->setSpecies(42);
@@ -167,11 +194,13 @@ class GenomeTest extends TestCase
 
     public function testSnakeNetwork()
     {
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $genome->addHiddenNode(2, 0, 0);
@@ -213,12 +242,14 @@ class GenomeTest extends TestCase
             [1, 1, 1],
         ];
 
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'identity'],
             1 => [ActivationFunction::class, 'binaryStep'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         // OR
 
@@ -243,11 +274,13 @@ class GenomeTest extends TestCase
             [1, 1, 1],
         ];
 
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'binaryStep'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $genome->addInputNode(2, 0, 0);
@@ -295,11 +328,13 @@ class GenomeTest extends TestCase
             [1, 1, 0],
         ];
 
-        $genome = new $this->className([
+        $genome = new $this->className(
+            [
             0 => [ActivationFunction::class, 'binaryStep'],
-        ], [
+            ], [
             0 => 'array_sum',
-        ]);
+            ]
+        );
 
         $genome->addInputNode(1, 0, 0);
         $genome->addInputNode(2, 0, 0);

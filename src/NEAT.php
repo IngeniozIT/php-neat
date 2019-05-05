@@ -38,7 +38,7 @@ class NEAT extends NeatConfig implements NeatInterface
         return $this;
     }
 
-    public function &getPool(): GenomePoolInterface
+    public function &pool(): GenomePoolInterface
     {
         if (null === $this->genomePool) {
             $this->createPool();
@@ -58,77 +58,38 @@ class NEAT extends NeatConfig implements NeatInterface
         $genomePool = new $genomePoolClass($genePool);
 
         $this->setPool($genomePool);
+        $method = $this->getInitializationMethod();
+        $method($this);
 
         return $this;
-    }
-
-
-
-    protected $genePool = null;
-
-    public function importGenomePool(GenomePoolInterface &$genomePool): NEAT
-    {
-        $this->genomePool = $genomePool;
-
-        return $this;
-    }
-
-    public function &getGenomePool(): ?GenomePoolInterface
-    {
-        $this->prepareRun();
-        return $this->genomePool;
-    }
-
-    public function importGenePool(GenePoolInterface &$genePool): NEAT
-    {
-        $this->genePool = $genePool;
-
-        return $this;
-    }
-
-    public function &getGenePool(): ?GenePoolInterface
-    {
-        $this->prepareRun();
-        return $this->genePool;
     }
 
     // run algorithm
 
-    public function run()
+    public function run(): bool
     {
         $generation = ($this->maxGenerations ?? -2) + 1;
 
-        while (--$generation &&
-            $this->runOnce()
-        ) {
+        while (--$generation) {
+            if ($this->runOnce()) {
+                return true;
+            }
         }
+
+        return false;
     }
 
     public function runOnce(): bool
     {
-        $this->prepareRun();
+        $this->pool();
 
         ++$this->currentGeneration;
 
         $this->speciation();
         $this->evaluation();
-
-        if ($this->thresholdMet()) {
-            return false;
-        }
-
         $this->mating();
 
-        return true;
-    }
-
-    public function prepareRun(): void
-    {
-        if (null === $this->genomePool) {
-            $this->validateConfig();
-            $method = $this->getInitializationMethod();
-            $method($this);
-        }
+        return $this->thresholdMet();
     }
 
     protected $speciated = false;
@@ -189,11 +150,13 @@ class NEAT extends NeatConfig implements NeatInterface
                 $genome->getFitness()
             ];
         }
-        uasort($genomesFitnesses, function (array $a, array $b): int {
-            return $this->fitnessCriterion === 'min' ?
+        uasort(
+            $genomesFitnesses, function (array $a, array $b): int {
+                return $this->fitnessCriterion === 'min' ?
                 $b[1] <=> $a[1] :
                 $a[1] <=> $b[1];
-        });
+            }
+        );
 
         // Count how many genomes will be killed
         /**
@@ -280,10 +243,14 @@ class NEAT extends NeatConfig implements NeatInterface
 
     public static function initPartiallyConnected(NEAT &$neat)
     {
-        $neat->validateConfig();
+        $neat->validatePoolCreation();
+
+        $genomePool = $neat->pool();
+        $genePool = $genomePool->genePool();
+
+        $genomeClass = $neat->getGenomeClass();
 
         // Gene pool
-        $genePool = new $neat->getGenePoolClass();
         $nbInputs = $neat->getNbInputs();
         for ($i = 1; $i <= $nbInputs; ++$i) {
             $genePool->addInputGene();
@@ -292,15 +259,13 @@ class NEAT extends NeatConfig implements NeatInterface
         for ($i = 1; $i <= $nbOutputs; ++$i) {
             $genePool->addOutputGene();
         }
-        $neat->importGenePool($genePool);
 
         // Genome pool
-        $genomePool = new $neat->getGenomePoolClass();
         $inputGenes = $genePool->getInputGenes();
         $outputGenes = $genePool->getOutputGenes();
         $populationSize = $neat->getPopulationSize();
         for ($i = 1; $i <= $populationSize; ++$i) {
-            $genome = new $neat->getGenomeClass($neat->getActivationFunctions(), $neat->getAggregationFunctions());
+            $genome = new $genomeClass($neat->getActivationFunctions(), $neat->getAggregationFunctions());
 
             foreach ($inputGenes as $inId) {
                 $genome->addinputNode($inId, 0, 0);
@@ -312,28 +277,29 @@ class NEAT extends NeatConfig implements NeatInterface
 
             $genomePool->addGenome($genome);
         }
-        $neat->importGenomePool($genomePool);
     }
 
     public static function initFullyConnected(NEAT &$neat)
     {
         self::initPartiallyConnected($neat);
 
-        $genePool = $neat->getGenePool();
-        $genomes = $neat->getGenomePool()->getGenomes();
+        $genomePool = $neat->pool();
+        $genePool = $genomePool->genePool();
+        $genomes = $genomePool->genomes();
 
         $inputGenes = $genePool->getInputGenes();
         $outputGenes = $genePool->getOutputGenes();
 
-        foreach ($genomes as &$genome) {
-            foreach ($inputGenes as $inId) {
-                foreach ($outputGenes as $outId) {
-                    $genome->addConnexion(
-                        $genePool->getConnexionGeneId($inId, $outId),
-                        $inId,
-                        $outId,
-                        Random::nrand($neat->getWeightInitializationMean(), $neat->getWeightInitializationStdev())
-                    );
+        foreach ($inputGenes as $inId) {
+            foreach ($outputGenes as $outId) {
+                $connId = $genePool->getConnexionGeneId($inId, $outId);
+                foreach ($genomes as &$genome) {
+                            $genome->addConnexion(
+                                $connId,
+                                $inId,
+                                $outId,
+                                Random::nrand($neat->getWeightInitializationMean(), $neat->getWeightInitializationStdev())
+                            );
                 }
             }
         }

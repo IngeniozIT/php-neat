@@ -18,7 +18,7 @@ class GenomePool implements GenomePoolInterface
         $this->genePool = $genePool;
     }
 
-    public function &getGenePool(): GenePoolInterface
+    public function &genePool(): GenePoolInterface
     {
         return $this->genePool;
     }
@@ -46,7 +46,7 @@ class GenomePool implements GenomePoolInterface
     public function getVectors(): array
     {
         $vects = [];
-        foreach ($this->getGenomes() as $genomeId => $genome) {
+        foreach ($this->genomes() as $genomeId => $genome) {
             $vects[$genomeId] = $genome->getVector();
         }
         return $vects;

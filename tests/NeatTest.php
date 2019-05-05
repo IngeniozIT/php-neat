@@ -10,6 +10,9 @@ use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
 use IngeniozIT\NEAT\GenomePool;
 use IngeniozIT\NEAT\GenePool;
 
+/**
+ * @coversDefaultClass \IngeniozIT\NEAT\NEAT
+ */
 class NeatTest extends TestCase
 {
     protected $className = NEAT::class;
@@ -49,7 +52,7 @@ class NeatTest extends TestCase
             ->populationSize(10)
             ->setPool($genomePool);
 
-        $this->assertSame($genomePool, $neat->getPool());
+        $this->assertSame($genomePool, $neat->pool());
     }
 
     public function testCreatePool()
@@ -62,10 +65,10 @@ class NeatTest extends TestCase
             ->populationSize(10)
             ->createPool();
 
-        $this->assertInstanceOf(GenomePoolInterface::class, $neat->getPool());
+        $this->assertInstanceOf(GenomePoolInterface::class, $neat->pool());
     }
 
-    public function testGetPool()
+    public function testPool()
     {
         $neat = new $this->className();
 
@@ -74,9 +77,27 @@ class NeatTest extends TestCase
             ->nbOutputs(2)
             ->populationSize(10);
 
-        $this->assertInstanceOf(GenomePoolInterface::class, $neat->getPool());
+        $this->assertInstanceOf(GenomePoolInterface::class, $neat->pool());
     }
-/*
+
+    public function testPartiallyConnected()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->initializationMethod([NEAT::class, 'initPartiallyConnected']);
+
+        $genePool = $neat->pool()->genePool();
+
+        $this->assertEquals(3, count($genePool->getInputGenes()));
+        $this->assertEquals(2, count($genePool->getOutputGenes()));
+        $this->assertEquals(0, count($genePool->getConnexionGenes()));
+    }
+
+    /*
+
     public function testFullyConnectedGenePool()
     {
         $neat = new NEAT();
@@ -108,23 +129,6 @@ class NeatTest extends TestCase
             $this->assertTrue($genePool->nodeGeneExists($outId, GenePoolInterface::NODE_OUTPUT));
         }
         $this->assertEquals(6, count($genePool->getConnexionGenes()));
-    }
-
-    public function testFSGenePool()
-    {
-        $neat = new NEAT();
-
-        $neat->initializationMethod([NEAT::class, 'initPartiallyConnected']);
-
-        $neat->nbInputs(3);
-        $neat->nbOutputs(2);
-
-        $neat->prepareRun();
-        $genePool = $neat->getGenePool();
-
-        $this->assertEquals(3, count($genePool->getInputGenes()));
-        $this->assertEquals(2, count($genePool->getOutputGenes()));
-        $this->assertEquals(0, count($genePool->getConnexionGenes()));
     }
 
     public function testGenomePoolNoInputsNumber()
@@ -181,7 +185,7 @@ class NeatTest extends TestCase
         }
     }
     */
-/*
+    /*
     public function testXor()
     {
         $neat = new NEAT();
@@ -206,7 +210,7 @@ class NeatTest extends TestCase
 
         $this->assertTrue(true);
     }
-*/
+    */
     public function xorFitnessFunction(iterable &$genomes): void
     {
         $trainingData = [

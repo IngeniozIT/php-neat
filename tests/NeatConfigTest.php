@@ -12,6 +12,9 @@ use IngeniozIT\NEAT\GenePool;
 use IngeniozIT\NEAT\GenomePool;
 use IngeniozIT\Math\ActivationFunction;
 
+/**
+ * @coversDefaultClass \IngeniozIT\NEAT\NeatConfig
+ */
 class NeatConfigTest extends TestCase
 {
     protected $classname = NEAT::class;

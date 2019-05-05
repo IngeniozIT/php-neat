@@ -7,7 +7,7 @@ interface GenomePoolInterface
 {
     public function __construct(GenePoolInterface $genePool);
 
-    public function &getGenePool(): GenePoolInterface;
+    public function &genePool(): GenePoolInterface;
 
     public function addGenome(GenomeInterface &$genome): GenomePoolInterface;
 

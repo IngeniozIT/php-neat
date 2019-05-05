@@ -10,7 +10,11 @@ use IngeniozIT\NEAT\GenomePool;
 
 use IngeniozIT\NEAT\GenePool;
 use IngeniozIT\NEAT\Genome;
+use IngeniozIT\Math\Random;
 
+/**
+ * @coversDefaultClass \IngeniozIT\NEAT\GenomePool
+ */
 class GenomePoolTest extends TestCase
 {
     protected $classname = GenomePool::class;
@@ -29,7 +33,7 @@ class GenomePoolTest extends TestCase
         $genePool = new GenePool();
         $genomePool = new $this->classname($genePool);
 
-        $this->assertSame($genomePool->getGenePool(), $genePool);
+        $this->assertSame($genomePool->genePool(), $genePool);
     }
 
     /**
@@ -49,6 +53,38 @@ class GenomePoolTest extends TestCase
         return $genomePool;
     }
 
+    public function testGetVectors()
+    {
+        $genomePool = new $this->classname(new GenePool());
+
+        $vectors = [];
+        for ($i = 0; $i < 5; ++$i) {
+            $genome = new Genome(
+                [
+                0 => [ActivationFunction::class, 'identity'],
+                ], [
+                0 => 'array_sum',
+                ]
+            );
+
+            $genome->addInputNode(1, 0, 0);
+            $genome->addHiddenNode(2, 0, 0);
+            $genome->addHiddenNode(3, 0, 0);
+            $genome->addHiddenNode(4, 0, 0);
+            $genome->addOutputNode(5, 0, 0);
+
+            $genome->addConnexion(1, 1, 2, Random::frand(-10, 10));
+            $genome->addConnexion(2, 2, 3, Random::frand(-10, 10));
+            $genome->addConnexion(3, 3, 4, Random::frand(-10, 10));
+            $genome->addConnexion(4, 4, 5, Random::frand(-10, 10));
+
+            $vectors[] = $genome->getVector();
+            $genomePool->addGenome($genome);
+        }
+
+        $this->assertEquals($vectors, $genomePool->getVectors());
+    }
+
     /**
      * @depends testAddGenome
      */
@@ -60,9 +96,11 @@ class GenomePoolTest extends TestCase
 
         $genomePool->assignGenomesToSpecies([1, 0], 42);
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             42 => [0, 1]
-        ], $genomePool->getSpecies());
+            ], $genomePool->getSpecies()
+        );
         $this->assertEquals(42, $genomes[0]->getSpecies());
         $this->assertEquals(42, $genomes[1]->getSpecies());
 
@@ -76,10 +114,12 @@ class GenomePoolTest extends TestCase
             ->assignGenomesToSpecies([0], 42)
             ->assignGenomesToSpecies([1], 21);
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             21 => [1],
             42 => [0]
-        ], $genomePool->getSpecies());
+            ], $genomePool->getSpecies()
+        );
         $this->assertEquals(42, $genomes[0]->getSpecies());
         $this->assertEquals(21, $genomes[1]->getSpecies());
 
