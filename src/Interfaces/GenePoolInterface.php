@@ -11,23 +11,23 @@ interface GenePoolInterface
 
     public function addInputGene(): void;
 
-    public function getInputGenes(): array;
+    public function inputGenes(): array;
 
     public function addOutputGene(): void;
 
-    public function getOutputGenes(): array;
+    public function outputGenes(): array;
 
     public function addHiddenGene(): void;
 
-    public function getHiddenGenes(): array;
+    public function hiddenGenes(): array;
 
-    public function getNodeGenes(): array;
+    public function nodeGenes(): array;
 
     public function nodeGeneExists(int $nodeId, int $nodeType = null): bool;
 
     public function addConnexionGene(int $inId, int $outId): void;
 
-    public function getConnexionGeneId(int $inId, int $outId): int;
+    public function connexionGeneId(int $inId, int $outId): int;
 
-    public function getConnexionGenes(): array;
+    public function connexionGenes(): array;
 }

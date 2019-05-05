@@ -83,7 +83,7 @@ class GenomePoolTest extends TestCase
             $genomePool->addGenome($genome);
         }
 
-        $this->assertEquals($vectors, $genomePool->getVectors());
+        $this->assertEquals($vectors, $genomePool->vectors());
     }
 
     /**
@@ -93,7 +93,7 @@ class GenomePoolTest extends TestCase
     {
         $genomes = $genomePool->genomes();
 
-        $this->assertEquals([], $genomePool->getSpecies());
+        $this->assertEquals([], $genomePool->species());
 
         $genomePool->assignGenomesToSpecies([1, 0], 42);
 
@@ -101,13 +101,13 @@ class GenomePoolTest extends TestCase
             [
                 42 => [0, 1]
             ],
-            $genomePool->getSpecies()
+            $genomePool->species()
         );
         $this->assertEquals(42, $genomes[0]->species());
         $this->assertEquals(42, $genomes[1]->species());
 
         $genomePool->assignGenomesToSpecies([0, 1], null);
-        $this->assertEquals([], $genomePool->getSpecies());
+        $this->assertEquals([], $genomePool->species());
         foreach ($genomes as $genome) {
             $this->assertNull($genome->species());
         }
@@ -121,7 +121,7 @@ class GenomePoolTest extends TestCase
                 21 => [1],
                 42 => [0]
             ],
-            $genomePool->getSpecies()
+            $genomePool->species()
         );
         $this->assertEquals(42, $genomes[0]->species());
         $this->assertEquals(21, $genomes[1]->species());
@@ -135,7 +135,7 @@ class GenomePoolTest extends TestCase
     public function testResetSpecies(GenomePoolInterface $genomePool)
     {
         $genomePool->resetSpecies();
-        $this->assertEquals([], $genomePool->getSpecies());
+        $this->assertEquals([], $genomePool->species());
 
         foreach ($genomePool->genomes() as $genome) {
             $this->assertNull($genome->species());

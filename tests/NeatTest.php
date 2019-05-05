@@ -80,6 +80,22 @@ class NeatTest extends TestCase
         $this->assertInstanceOf(GenomePoolInterface::class, $neat->pool());
     }
 
+    public function testNotConnected()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->initializationMethod([NEAT::class, 'initNotConnected']);
+
+        $genePool = $neat->pool()->genePool();
+
+        foreach ($neat->pool()->genomes() as $genome) {
+            $this->assertEquals(0, count($genome->connexions()));
+        }
+    }
+
     public function testPartiallyConnected()
     {
         $neat = new $this->className();
@@ -91,9 +107,25 @@ class NeatTest extends TestCase
 
         $genePool = $neat->pool()->genePool();
 
-        $this->assertEquals(3, count($genePool->getInputGenes()));
-        $this->assertEquals(2, count($genePool->getOutputGenes()));
-        $this->assertEquals(0, count($genePool->getConnexionGenes()));
+        foreach ($neat->pool()->genomes() as $genome) {
+            $this->assertEquals(1, count($genome->connexions()));
+        }
+    }
+
+    public function testFullyConnected()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->initializationMethod([NEAT::class, 'initFullyConnected']);
+
+        $genePool = $neat->pool()->genePool();
+
+        foreach ($neat->pool()->genomes() as $genome) {
+            $this->assertEquals(6, count($genome->connexions()));
+        }
     }
 
     /*

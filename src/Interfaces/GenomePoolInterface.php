@@ -13,9 +13,9 @@ interface GenomePoolInterface
 
     public function &genomes(): array;
 
-    public function getVectors(): array;
+    public function vectors(): array;
 
-    public function getSpecies(): array;
+    public function species(): array;
 
     public function assignGenomesToSpecies(array $genomesId, ?int $speciesId): GenomePoolInterface;
 

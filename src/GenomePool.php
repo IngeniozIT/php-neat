@@ -43,7 +43,7 @@ class GenomePool implements GenomePoolInterface
         return $this->genomes;
     }
 
-    public function getVectors(): array
+    public function vectors(): array
     {
         $vects = [];
         foreach ($this->genomes() as $genomeId => $genome) {
@@ -52,7 +52,7 @@ class GenomePool implements GenomePoolInterface
         return $vects;
     }
 
-    public function getSpecies(): array
+    public function species(): array
     {
         return $this->species;
     }

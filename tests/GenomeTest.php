@@ -47,6 +47,7 @@ class GenomeTest extends TestCase
         $genome->addOutputNode(2, 0, 0);
         $genome->addConnexion(1, 1, 2, 1);
         $genome->addConnexion(2, 1, 2, 1);
+
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
         $genome->addConnexion(1, 1, 2, 1);
     }
@@ -76,6 +77,36 @@ class GenomeTest extends TestCase
         $genome->checkConnexion(42);
     }
 
+    public function testConnexions()
+    {
+        $genome = new $this->className(
+            [0 => [ActivationFunction::class, 'identity']],
+            [0 => 'array_sum']
+        );
+
+        $genome->addInputNode(1, 0, 0);
+        $genome->addInputNode(2, 0, 0);
+        $genome->addInputNode(3, 0, 0);
+        $genome->addOutputNode(4, 0, 0);
+        $genome->addOutputNode(5, 0, 0);
+
+        $genome->addConnexion(1, 1, 4, 1);
+        $genome->addConnexion(2, 1, 5, 2);
+        $genome->addConnexion(3, 2, 4, 3);
+        $genome->addConnexion(4, 2, 5, 4);
+        $genome->addConnexion(5, 3, 4, 5);
+        $genome->addConnexion(6, 3, 5, 6);
+
+        $this->assertEquals([
+            1 => 1,
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => 5,
+            6 => 6,
+        ], $genome->connexions());
+    }
+
     public function testAddExistingNode()
     {
         $genome = new $this->className(
@@ -84,6 +115,7 @@ class GenomeTest extends TestCase
         );
 
         $genome->addInputNode(1, 0, 0);
+
         $this->expectException(\IngeniozIT\NEAT\Exceptions\GenomeException::class);
         $genome->addInputNode(1, 0, 0);
     }
@@ -275,9 +307,9 @@ class GenomeTest extends TestCase
             [1, 1, 0],
         ];
 
-        $genome->setConnexionWeight(1, -$genome->getConnexionWeight(1));
-        $genome->setConnexionWeight(2, -$genome->getConnexionWeight(2));
-        $genome->setConnexionWeight(3, -$genome->getConnexionWeight(3));
+        $genome->setConnexionWeight(1, -$genome->connexionWeight(1));
+        $genome->setConnexionWeight(2, -$genome->connexionWeight(2));
+        $genome->setConnexionWeight(3, -$genome->connexionWeight(3));
 
         foreach ($nandCases as $case) {
             $this->assertEquals($case[2], $genome->activate([$case[0], $case[1], 1])[0]);

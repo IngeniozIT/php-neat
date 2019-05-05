@@ -28,7 +28,7 @@ class GenePool implements GenePoolInterface
         $this->inputGenes[] = $this->nodeId;
     }
 
-    public function getInputGenes(): array
+    public function inputGenes(): array
     {
         return $this->inputGenes;
     }
@@ -40,7 +40,7 @@ class GenePool implements GenePoolInterface
         $this->outputGenes[] = $this->nodeId;
     }
 
-    public function getOutputGenes(): array
+    public function outputGenes(): array
     {
         return $this->outputGenes;
     }
@@ -52,12 +52,12 @@ class GenePool implements GenePoolInterface
         $this->hiddenGenes[] = $this->nodeId;
     }
 
-    public function getHiddenGenes(): array
+    public function hiddenGenes(): array
     {
         return $this->hiddenGenes;
     }
 
-    public function getNodeGenes(): array
+    public function nodeGenes(): array
     {
         return $this->nodeGenes;
     }
@@ -89,7 +89,7 @@ class GenePool implements GenePoolInterface
         $this->connexionLinks[$inId][$outId] = $this->connectId;
     }
 
-    public function getConnexionGeneId(int $inId, int $outId): int
+    public function connexionGeneId(int $inId, int $outId): int
     {
         if (!isset($this->connexionLinks[$inId][$outId])) {
             $this->addConnexionGene($inId, $outId);
@@ -98,7 +98,7 @@ class GenePool implements GenePoolInterface
         return $this->connexionLinks[$inId][$outId];
     }
 
-    public function getConnexionGenes(): array
+    public function connexionGenes(): array
     {
         return $this->connexionGenes;
     }

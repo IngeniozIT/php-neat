@@ -82,6 +82,13 @@ interface GenomeInterface
     public function checkConnexion(int $connexionId): void;
 
     /**
+     * Get the connexions of the genome.
+     *
+     * @return array The connexions.
+     */
+    public function connexions(): array;
+
+    /**
      * Check if the genome has a specific node.
      *
      * @param int $nodeId The id of the node to check.
@@ -107,7 +114,7 @@ interface GenomeInterface
      *
      * @return float The weight of the connexion.
      */
-    public function getConnexionWeight(int $connexionId): float;
+    public function connexionWeight(int $connexionId): float;
 
     /**
      * Set the weight of a specific connexion.

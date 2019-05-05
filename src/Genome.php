@@ -148,6 +148,16 @@ class Genome implements GenomeInterface
     }
 
     /**
+     * Get the connexions of the genome.
+     *
+     * @return array The connexions.
+     */
+    public function connexions(): array
+    {
+        return $this->connexions;
+    }
+
+    /**
      * Check if the genome has a specific node.
      *
      * @param int $nodeId The id of the node to check.
@@ -181,7 +191,7 @@ class Genome implements GenomeInterface
      *
      * @return float The weight of the connexion.
      */
-    public function getConnexionWeight(int $connexionId): float
+    public function connexionWeight(int $connexionId): float
     {
         $this->checkConnexion($connexionId);
         return $this->connexions[$connexionId];

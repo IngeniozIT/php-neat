@@ -244,6 +244,61 @@ class NEAT extends NeatConfig implements NeatInterface
 
     public static function initPartiallyConnected(NEAT &$neat)
     {
+        self::initNotConnected($neat);
+
+        $genomePool = $neat->pool();
+        $genePool = $genomePool->genePool();
+        $genomes = $genomePool->genomes();
+
+        $inputGenes = $genePool->inputGenes();
+        $outputGenes = $genePool->outputGenes();
+
+        foreach ($genomes as &$genome) {
+            $inId = $inputGenes[rand(0, count($inputGenes) - 1)];
+            $outId = $outputGenes[rand(0, count($outputGenes) - 1)];
+            $genome->addConnexion(
+                $genePool->connexionGeneId($inId, $outId),
+                $inId,
+                $outId,
+                Random::nrand(
+                    $neat->getWeightInitializationMean(),
+                    $neat->getWeightInitializationStdev()
+                )
+            );
+        }
+    }
+
+    public static function initFullyConnected(NEAT &$neat)
+    {
+        self::initNotConnected($neat);
+
+        $genomePool = $neat->pool();
+        $genePool = $genomePool->genePool();
+        $genomes = $genomePool->genomes();
+
+        $inputGenes = $genePool->inputGenes();
+        $outputGenes = $genePool->outputGenes();
+
+        foreach ($inputGenes as $inId) {
+            foreach ($outputGenes as $outId) {
+                $connId = $genePool->connexionGeneId($inId, $outId);
+                foreach ($genomes as &$genome) {
+                    $genome->addConnexion(
+                        $connId,
+                        $inId,
+                        $outId,
+                        Random::nrand(
+                            $neat->getWeightInitializationMean(),
+                            $neat->getWeightInitializationStdev()
+                        )
+                    );
+                }
+            }
+        }
+    }
+
+    public static function initNotConnected(NEAT &$neat)
+    {
         $neat->validatePoolCreation();
 
         $genomePool = $neat->pool();
@@ -262,8 +317,8 @@ class NEAT extends NeatConfig implements NeatInterface
         }
 
         // Genome pool
-        $inputGenes = $genePool->getInputGenes();
-        $outputGenes = $genePool->getOutputGenes();
+        $inputGenes = $genePool->inputGenes();
+        $outputGenes = $genePool->outputGenes();
         $populationSize = $neat->getPopulationSize();
         for ($i = 1; $i <= $populationSize; ++$i) {
             $genome = new $genomeClass($neat->getActivationFunctions(), $neat->getAggregationFunctions());
@@ -277,35 +332,6 @@ class NEAT extends NeatConfig implements NeatInterface
             }
 
             $genomePool->addGenome($genome);
-        }
-    }
-
-    public static function initFullyConnected(NEAT &$neat)
-    {
-        self::initPartiallyConnected($neat);
-
-        $genomePool = $neat->pool();
-        $genePool = $genomePool->genePool();
-        $genomes = $genomePool->genomes();
-
-        $inputGenes = $genePool->getInputGenes();
-        $outputGenes = $genePool->getOutputGenes();
-
-        foreach ($inputGenes as $inId) {
-            foreach ($outputGenes as $outId) {
-                $connId = $genePool->getConnexionGeneId($inId, $outId);
-                foreach ($genomes as &$genome) {
-                    $genome->addConnexion(
-                        $connId,
-                        $inId,
-                        $outId,
-                        Random::nrand(
-                            $neat->getWeightInitializationMean(),
-                            $neat->getWeightInitializationStdev()
-                        )
-                    );
-                }
-            }
         }
     }
 }
