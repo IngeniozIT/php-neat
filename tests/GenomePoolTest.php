@@ -61,9 +61,10 @@ class GenomePoolTest extends TestCase
         for ($i = 0; $i < 5; ++$i) {
             $genome = new Genome(
                 [
-                0 => [ActivationFunction::class, 'identity'],
-                ], [
-                0 => 'array_sum',
+                    0 => [ActivationFunction::class, 'identity'],
+                ],
+                [
+                    0 => 'array_sum',
                 ]
             );
 
@@ -78,7 +79,7 @@ class GenomePoolTest extends TestCase
             $genome->addConnexion(3, 3, 4, Random::frand(-10, 10));
             $genome->addConnexion(4, 4, 5, Random::frand(-10, 10));
 
-            $vectors[] = $genome->getVector();
+            $vectors[] = $genome->vector();
             $genomePool->addGenome($genome);
         }
 
@@ -98,16 +99,17 @@ class GenomePoolTest extends TestCase
 
         $this->assertEquals(
             [
-            42 => [0, 1]
-            ], $genomePool->getSpecies()
+                42 => [0, 1]
+            ],
+            $genomePool->getSpecies()
         );
-        $this->assertEquals(42, $genomes[0]->getSpecies());
-        $this->assertEquals(42, $genomes[1]->getSpecies());
+        $this->assertEquals(42, $genomes[0]->species());
+        $this->assertEquals(42, $genomes[1]->species());
 
         $genomePool->assignGenomesToSpecies([0, 1], null);
         $this->assertEquals([], $genomePool->getSpecies());
         foreach ($genomes as $genome) {
-            $this->assertNull($genome->getSpecies());
+            $this->assertNull($genome->species());
         }
 
         $genomePool
@@ -116,12 +118,13 @@ class GenomePoolTest extends TestCase
 
         $this->assertEquals(
             [
-            21 => [1],
-            42 => [0]
-            ], $genomePool->getSpecies()
+                21 => [1],
+                42 => [0]
+            ],
+            $genomePool->getSpecies()
         );
-        $this->assertEquals(42, $genomes[0]->getSpecies());
-        $this->assertEquals(21, $genomes[1]->getSpecies());
+        $this->assertEquals(42, $genomes[0]->species());
+        $this->assertEquals(21, $genomes[1]->species());
 
         return $genomePool;
     }
@@ -135,7 +138,7 @@ class GenomePoolTest extends TestCase
         $this->assertEquals([], $genomePool->getSpecies());
 
         foreach ($genomePool->genomes() as $genome) {
-            $this->assertNull($genome->getSpecies());
+            $this->assertNull($genome->species());
         }
     }
 
@@ -149,6 +152,6 @@ class GenomePoolTest extends TestCase
         $genomePool->removeGenome(0);
         $this->assertSame([1 => $genomes[1]], $genomePool->genomes());
 
-        $this->assertNull($genomes[0]->getSpecies());
+        $this->assertNull($genomes[0]->species());
     }
 }

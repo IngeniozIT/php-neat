@@ -26,8 +26,9 @@ class GenePoolTest extends TestCase
         $this->assertEquals([], $genePool->getHiddenGenes());
         $this->assertEquals(
             [
-            0 => GenePoolInterface::NODE_INPUT
-            ], $genePool->getNodeGenes()
+                0 => GenePoolInterface::NODE_INPUT
+            ],
+            $genePool->getNodeGenes()
         );
         $this->assertTrue($genePool->nodeGeneExists(0));
         $this->assertTrue($genePool->nodeGeneExists(0, GenePoolInterface::NODE_INPUT));
@@ -44,8 +45,9 @@ class GenePoolTest extends TestCase
         $this->assertEquals([], $genePool->getHiddenGenes());
         $this->assertEquals(
             [
-            0 => GenePoolInterface::NODE_OUTPUT
-            ], $genePool->getNodeGenes()
+                0 => GenePoolInterface::NODE_OUTPUT
+            ],
+            $genePool->getNodeGenes()
         );
         $this->assertTrue($genePool->nodeGeneExists(0));
         $this->assertTrue($genePool->nodeGeneExists(0, GenePoolInterface::NODE_OUTPUT));
@@ -62,8 +64,9 @@ class GenePoolTest extends TestCase
         $this->assertEquals([0], $genePool->getHiddenGenes());
         $this->assertEquals(
             [
-            0 => GenePoolInterface::NODE_HIDDEN
-            ], $genePool->getNodeGenes()
+                0 => GenePoolInterface::NODE_HIDDEN
+            ],
+            $genePool->getNodeGenes()
         );
         $this->assertTrue($genePool->nodeGeneExists(0));
         $this->assertTrue($genePool->nodeGeneExists(0, GenePoolInterface::NODE_HIDDEN));
@@ -85,13 +88,14 @@ class GenePoolTest extends TestCase
         $this->assertEquals([4, 5], $genePool->getHiddenGenes());
         $this->assertEquals(
             [
-            0 => GenePoolInterface::NODE_INPUT,
-            1 => GenePoolInterface::NODE_INPUT,
-            2 => GenePoolInterface::NODE_INPUT,
-            3 => GenePoolInterface::NODE_OUTPUT,
-            4 => GenePoolInterface::NODE_HIDDEN,
-            5 => GenePoolInterface::NODE_HIDDEN
-            ], $genePool->getNodeGenes()
+                0 => GenePoolInterface::NODE_INPUT,
+                1 => GenePoolInterface::NODE_INPUT,
+                2 => GenePoolInterface::NODE_INPUT,
+                3 => GenePoolInterface::NODE_OUTPUT,
+                4 => GenePoolInterface::NODE_HIDDEN,
+                5 => GenePoolInterface::NODE_HIDDEN
+            ],
+            $genePool->getNodeGenes()
         );
     }
 
@@ -126,8 +130,9 @@ class GenePoolTest extends TestCase
 
         $this->assertEquals(
             [
-            0 => [0, 1]
-            ], $genePool->getConnexionGenes()
+                0 => [0, 1]
+            ],
+            $genePool->getConnexionGenes()
         );
         $this->assertEquals(0, $genePool->getConnexionGeneId(0, 1));
     }
@@ -164,13 +169,14 @@ class GenePoolTest extends TestCase
 
         $this->assertEquals(
             [
-            0 => [0, 3],
-            1 => [3, 0],
-            2 => [1, 3],
-            3 => [2, 3],
-            4 => [0, 4],
-            5 => [4, 3],
-            ], $genePool->getConnexionGenes()
+                0 => [0, 3],
+                1 => [3, 0],
+                2 => [1, 3],
+                3 => [2, 3],
+                4 => [0, 4],
+                5 => [4, 3],
+            ],
+            $genePool->getConnexionGenes()
         );
         $this->assertEquals(0, $genePool->getConnexionGeneId(0, 3));
         $this->assertEquals(1, $genePool->getConnexionGeneId(3, 0));

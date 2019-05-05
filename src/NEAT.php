@@ -151,7 +151,8 @@ class NEAT extends NeatConfig implements NeatInterface
             ];
         }
         uasort(
-            $genomesFitnesses, function (array $a, array $b): int {
+            $genomesFitnesses,
+            function (array $a, array $b): int {
                 return $this->fitnessCriterion === 'min' ?
                 $b[1] <=> $a[1] :
                 $a[1] <=> $b[1];
@@ -294,12 +295,15 @@ class NEAT extends NeatConfig implements NeatInterface
             foreach ($outputGenes as $outId) {
                 $connId = $genePool->getConnexionGeneId($inId, $outId);
                 foreach ($genomes as &$genome) {
-                            $genome->addConnexion(
-                                $connId,
-                                $inId,
-                                $outId,
-                                Random::nrand($neat->getWeightInitializationMean(), $neat->getWeightInitializationStdev())
-                            );
+                    $genome->addConnexion(
+                        $connId,
+                        $inId,
+                        $outId,
+                        Random::nrand(
+                            $neat->getWeightInitializationMean(),
+                            $neat->getWeightInitializationStdev()
+                        )
+                    );
                 }
             }
         }

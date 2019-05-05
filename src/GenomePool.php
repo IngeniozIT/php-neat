@@ -47,7 +47,7 @@ class GenomePool implements GenomePoolInterface
     {
         $vects = [];
         foreach ($this->genomes() as $genomeId => $genome) {
-            $vects[$genomeId] = $genome->getVector();
+            $vects[$genomeId] = $genome->vector();
         }
         return $vects;
     }
@@ -60,7 +60,7 @@ class GenomePool implements GenomePoolInterface
     public function assignGenomesToSpecies(array $genomesId, ?int $speciesId): GenomePoolInterface
     {
         foreach ($genomesId as $genomeId) {
-            $currentSpeciesId = $this->genomes[$genomeId]->getSpecies();
+            $currentSpeciesId = $this->genomes[$genomeId]->species();
 
             // Genome previously had a species
             if (null !== $currentSpeciesId) {
