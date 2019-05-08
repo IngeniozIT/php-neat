@@ -10,13 +10,9 @@
             "email": "contact@ingenioz.it"
         }
     ],
-    "minimum-stability": "dev",
-    "repositories": [
-        { "type": "vcs", "url": "https://github.com/IngeniozIT/php-math.git" }
-    ],
     "require": {
-        "ingenioz-it/php-math": "^1",
-        "php": ">=7.2"
+        "php": ">=7.1",
+        "ingenioz-it/php-math": "^1.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^7"
