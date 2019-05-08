@@ -94,18 +94,18 @@ class NEAT extends NeatConfig implements NeatInterface
 
     protected $speciated = false;
 
-    protected function speciation()
+    public function speciation()
     {
         if ($this->speciated) {
             return;
         }
 
-        $genomePool = $this->getGenomePool();
+        $genomePool = $this->pool();
         $genomePool->resetSpecies();
-        $genomes = $genomePool->getVectors();
-        $kMeans = new KMeans($genomes);
-        while (!$kMeans->classifyAndOptimize()) {
-        }
+        $genomeVects = $genomePool->vectors();
+
+        $kMeans = new KMeans($genomeVects);
+        $kMeans->classifyAndOptimize();
         $species = $kMeans->clusters();
 
         foreach ($species as $speciesId => $gens) {
@@ -115,15 +115,15 @@ class NEAT extends NeatConfig implements NeatInterface
         $this->speciated = true;
     }
 
-    protected function evaluation()
+    public function evaluation()
     {
-        $genomes = $this->getGenomePool()->getGenomes();
+        $genomes = $this->pool()->genomes();
         foreach ($genomes as $genome) {
             $genome->setFitness(null);
         }
         $this->getFitnessFunction()($genomes);
         foreach ($genomes as $genome) {
-            if (null === $genome->getFitness()) {
+            if (null === $genome->fitness()) {
                 throw new NeatException('All genomes must have a fitness.');
             }
         }

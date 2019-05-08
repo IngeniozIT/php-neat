@@ -87,6 +87,7 @@ class NeatTest extends TestCase
         $neat
             ->nbInputs(3)
             ->nbOutputs(2)
+            ->populationSize(3)
             ->initializationMethod([NEAT::class, 'initNotConnected']);
 
         $genePool = $neat->pool()->genePool();
@@ -103,6 +104,7 @@ class NeatTest extends TestCase
         $neat
             ->nbInputs(3)
             ->nbOutputs(2)
+            ->populationSize(3)
             ->initializationMethod([NEAT::class, 'initPartiallyConnected']);
 
         $genePool = $neat->pool()->genePool();
@@ -119,104 +121,125 @@ class NeatTest extends TestCase
         $neat
             ->nbInputs(3)
             ->nbOutputs(2)
+            ->populationSize(3)
             ->initializationMethod([NEAT::class, 'initFullyConnected']);
 
         $genePool = $neat->pool()->genePool();
 
-        foreach ($neat->pool()->genomes() as $genome) {
-            $this->assertEquals(6, count($genome->connexions()));
-        }
-    }
+        $inputGenes = $genePool->inputGenes();
+        $outputGenes = $genePool->outputGenes();
 
-    /*
-
-    public function testFullyConnectedGenePool()
-    {
-        $neat = new NEAT();
-
-        $neat->initializationMethod([NEAT::class, 'initFullyConnected']);
-
-        $neat->nbInputs(3);
-        $neat->nbOutputs(2);
-
-        $genePool = $neat->getGenePool();
-
-        $inputGenes = $genePool->getInputGenes();
-        $outputGenes = $genePool->getOutputGenes();
-        $connexionGenes = $genePool->getConnexionGenes();
-
-        $this->assertEquals(3, count($inputGenes));
-        $this->assertEquals(2, count($outputGenes));
-        $this->assertEquals(6, count($connexionGenes));
-
+        $connexionIds = [];
         foreach ($inputGenes as $inId) {
-            $this->assertTrue($genePool->nodeGeneExists($inId));
-            $this->assertTrue($genePool->nodeGeneExists($inId, GenePoolInterface::NODE_INPUT));
             foreach ($outputGenes as $outId) {
-                $this->assertEquals([$inId, $outId], $connexionGenes[$genePool->getConnexionGeneId($inId, $outId)]);
+                $connexionIds[] = $genePool->connexionGeneId($inId, $outId);
             }
         }
-        foreach ($outputGenes as $outId) {
-            $this->assertTrue($genePool->nodeGeneExists($outId));
-            $this->assertTrue($genePool->nodeGeneExists($outId, GenePoolInterface::NODE_OUTPUT));
+
+        foreach ($neat->pool()->genomes() as $genome) {
+            $connexions = $genome->connexions();
+            $this->assertEquals(6, count($connexions));
+            $validGenes = true;
+            foreach ($connexionIds as $connId) {
+                $validGenes = $validGenes && array_key_exists($connId, $connexions);
+            }
+            $this->assertTrue($validGenes);
         }
-        $this->assertEquals(6, count($genePool->getConnexionGenes()));
     }
 
-    public function testGenomePoolNoInputsNumber()
+    public function testSpeciation()
     {
-        $neat = new NEAT();
+        $neat = new $this->className();
 
-        $neat->nbOutputs(2);
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(3)
+            ->initializationMethod([NEAT::class, 'initFullyConnected']);
 
-        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
-        $neat->createGenomePool();
-    }
+        $pool = $neat->pool();
+        $genomes = $pool->genomes();
+        foreach ($genomes as $genome) {
+            $this->assertNull($genome->species());
+        }
 
-    public function testGenomePoolNoOutputsNumber()
-    {
-        $neat = new NEAT();
-
-        $neat->nbInputs(3);
-
-        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
-        $neat->createGenomePool();
-    }
-
-    public function testFullyConnectedGenomePool()
-    {
-        $neat = new NEAT();
-
-        $neat->initializationMethod([NEAT::class, 'initFullyConnected']);
-
-        $neat->nbInputs(3);
-        $neat->nbOutputs(2);
-        $neat->populationSize(3);
-
-        $neat->createGenomePool();
-
-        $genePool = $neat->getGenePool();
-        $inputGenes = $genePool->getInputGenes();
-        $outputGenes = $genePool->getOutputGenes();
-        $connexionGenes = $genePool->getConnexionGenes();
-
-        $genomes = $neat->getGenomePool()->getGenomes();
-
-        $this->assertEquals(3, count($genomes));
+        $neat->speciation();
 
         foreach ($genomes as $genome) {
-            foreach ($inputGenes as $inId) {
-                $this->assertTrue($genome->hasNode($inId));
-            }
-            foreach ($outputGenes as $outId) {
-                $this->assertTrue($genome->hasNode($outId));
-            }
-            foreach ($connexionGenes as $connId => $connexion) {
-                $this->assertTrue($genome->hasConnexion($connId));
-            }
+            $this->assertNotNull($genome->species());
         }
+
+        $species = $pool->species();
+        $neat->speciation();
+        $this->assertSame($species, $pool->species());
     }
-    */
+
+    public function testEvaluation()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(3)
+            ->initializationMethod([NEAT::class, 'initFullyConnected'])
+            ->fitnessFunction([$this, 'xorFitnessFunction']);
+
+        $pool = $neat->pool();
+        $genomes = $pool->genomes();
+
+        foreach ($genomes as $genome) {
+            $this->assertNull($genome->fitness());
+        }
+
+        $neat->evaluation();
+
+        $fitnesses = [];
+        foreach ($genomes as $genomeId => $genome) {
+            $fitness = $genome->fitness();
+            $this->assertNotNull($fitness);
+            $fitnesses[$genomeId] = $fitness;
+        }
+
+        $neat->evaluation();
+
+        $fitnessesCmp = [];
+        foreach ($genomes as $genomeId => $genome) {
+            $fitness = $genome->fitness();
+            $fitnessesCmp[$genomeId] = $fitness;
+        }
+
+        $this->assertEquals($fitnesses, $fitnessesCmp);
+    }
+
+    public function testEvaluationBadFitnessFunction()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(3)
+            ->initializationMethod([NEAT::class, 'initFullyConnected'])
+            ->fitnessFunction([$this, 'badFitnessFunction']);
+
+        $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
+        $neat->evaluation();
+    }
+/*
+    public function testRunOnce()
+    {
+        $neat = new $this->className();
+
+        $neat
+            ->nbInputs(3)
+            ->nbOutputs(2)
+            ->populationSize(3)
+            ->initializationMethod([NEAT::class, 'initFullyConnected']);
+
+        $neat->runOnce();
+    }
+
     /*
     public function testXor()
     {
@@ -284,6 +307,10 @@ class NeatTest extends TestCase
             // Set the fitness
             $genome->setFitness($fitness);
         }
+    }
+
+    public function badFitnessFunction(iterable &$genomes): void
+    {
     }
 
     /**
