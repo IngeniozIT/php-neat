@@ -4,12 +4,13 @@ declare(strict_types = 1);
 namespace IngeniozIT\NEAT;
 
 use IngeniozIT\NEAT\Interfaces\NeatConfigInterface;
-use IngeniozIT\Math\ActivationFunction;
 use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
+use IngeniozIT\Math\ActivationFunction;
 use IngeniozIT\NEAT\Exceptions\NeatConfigException;
 use IngeniozIT\NEAT\Genome;
 use IngeniozIT\NEAT\GenomePool;
 use IngeniozIT\NEAT\GenePool;
+use IngeniozIT\NEAT\NeatUtils;
 
 abstract class NeatConfig implements NeatConfigInterface
 {
@@ -18,11 +19,11 @@ abstract class NeatConfig implements NeatConfigInterface
         'nb_outputs' => 0,
         'population_size' => 0,
         'max_generations' => 0,
-        'fitness_criterion' => [NEAT::class, 'min'],
+        'fitness_criterion' => [NeatUtils::class, 'min'],
         'fitness_threshold' => 0.0,
         'fitness_function' => null,
 
-        'initialization_method' => [NEAT::class, 'initFullyConnected'],
+        'initialization_method' => [NeatUtils::class, 'initFullyConnected'],
         'activation_functions' => [
             0 => [ActivationFunction::class, 'sigmoid'],
         ],

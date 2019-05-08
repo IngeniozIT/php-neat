@@ -6,6 +6,7 @@ namespace IngeniozIT\NEAT\Tests;
 use PHPUnit\Framework\TestCase;
 
 use IngeniozIT\NEAT\NEAT;
+use IngeniozIT\NEAT\NeatUtils;
 use IngeniozIT\NEAT\Interfaces\GenomePoolInterface;
 use IngeniozIT\NEAT\GenomePool;
 use IngeniozIT\NEAT\GenePool;
@@ -80,73 +81,6 @@ class NeatTest extends TestCase
         $this->assertInstanceOf(GenomePoolInterface::class, $neat->pool());
     }
 
-    public function testNotConnected()
-    {
-        $neat = new $this->className();
-
-        $neat
-            ->nbInputs(3)
-            ->nbOutputs(2)
-            ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initNotConnected']);
-
-        $genePool = $neat->pool()->genePool();
-
-        foreach ($neat->pool()->genomes() as $genome) {
-            $this->assertEquals(0, count($genome->connexions()));
-        }
-    }
-
-    public function testPartiallyConnected()
-    {
-        $neat = new $this->className();
-
-        $neat
-            ->nbInputs(3)
-            ->nbOutputs(2)
-            ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initPartiallyConnected']);
-
-        $genePool = $neat->pool()->genePool();
-
-        foreach ($neat->pool()->genomes() as $genome) {
-            $this->assertEquals(1, count($genome->connexions()));
-        }
-    }
-
-    public function testFullyConnected()
-    {
-        $neat = new $this->className();
-
-        $neat
-            ->nbInputs(3)
-            ->nbOutputs(2)
-            ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initFullyConnected']);
-
-        $genePool = $neat->pool()->genePool();
-
-        $inputGenes = $genePool->inputGenes();
-        $outputGenes = $genePool->outputGenes();
-
-        $connexionIds = [];
-        foreach ($inputGenes as $inId) {
-            foreach ($outputGenes as $outId) {
-                $connexionIds[] = $genePool->connexionGeneId($inId, $outId);
-            }
-        }
-
-        foreach ($neat->pool()->genomes() as $genome) {
-            $connexions = $genome->connexions();
-            $this->assertEquals(6, count($connexions));
-            $validGenes = true;
-            foreach ($connexionIds as $connId) {
-                $validGenes = $validGenes && array_key_exists($connId, $connexions);
-            }
-            $this->assertTrue($validGenes);
-        }
-    }
-
     public function testSpeciation()
     {
         $neat = new $this->className();
@@ -155,7 +89,7 @@ class NeatTest extends TestCase
             ->nbInputs(3)
             ->nbOutputs(2)
             ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initFullyConnected']);
+            ->initializationMethod([NeatUtils::class, 'initFullyConnected']);
 
         $pool = $neat->pool();
         $genomes = $pool->genomes();
@@ -182,7 +116,7 @@ class NeatTest extends TestCase
             ->nbInputs(3)
             ->nbOutputs(2)
             ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initFullyConnected'])
+            ->initializationMethod([NeatUtils::class, 'initFullyConnected'])
             ->fitnessFunction([$this, 'xorFitnessFunction']);
 
         $pool = $neat->pool();
@@ -220,7 +154,7 @@ class NeatTest extends TestCase
             ->nbInputs(3)
             ->nbOutputs(2)
             ->populationSize(3)
-            ->initializationMethod([NEAT::class, 'initFullyConnected'])
+            ->initializationMethod([NeatUtils::class, 'initFullyConnected'])
             ->fitnessFunction([$this, 'badFitnessFunction']);
 
         $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
