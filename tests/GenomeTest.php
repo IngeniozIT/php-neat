@@ -97,14 +97,16 @@ class GenomeTest extends TestCase
         $genome->addConnexion(5, 3, 4, 5);
         $genome->addConnexion(6, 3, 5, 6);
 
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             1 => 1,
             2 => 2,
             3 => 3,
             4 => 4,
             5 => 5,
             6 => 6,
-        ], $genome->connexions());
+            ], $genome->connexions()
+        );
     }
 
     public function testAddExistingNode()

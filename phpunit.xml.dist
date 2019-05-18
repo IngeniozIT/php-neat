@@ -10,7 +10,7 @@
         processIsolation="false"
 		stopOnFailure="false">
 	<testsuites>
-		<testsuite name="NEAT Test Suite">
+		<testsuite name="Test Suite">
 			<directory suffix=".php">./tests</directory>
 		</testsuite>
 	</testsuites>

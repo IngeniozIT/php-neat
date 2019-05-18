@@ -104,8 +104,8 @@ class NeatUtils
 
     public static function min(GenomePoolInterface $genomePool, float $threshold): bool
     {
-        foreach ($genomePool->getGenomes() as $genome) {
-            if ($genome->getFitness() <= $threshold) {
+        foreach ($genomePool->genomes() as $genome) {
+            if ($genome->fitness() <= $threshold) {
                 return true;
             }
         }
@@ -115,8 +115,8 @@ class NeatUtils
 
     public static function max(GenomePoolInterface $genomePool, float $threshold): bool
     {
-        foreach ($genomePool->getGenomes() as $genome) {
-            if ($genome->getFitness() >= $threshold) {
+        foreach ($genomePool->genomes() as $genome) {
+            if ($genome->fitness() >= $threshold) {
                 return true;
             }
         }

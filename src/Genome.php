@@ -27,8 +27,8 @@ class Genome implements GenomeInterface
     /**
      * Constructor.
      *
-     * @param  callable[] $activationFunctions  The list of possible activation functions.
-     * @param  callable[] $aggregationFunctions The list of possible aggregation functions.
+     * @param callable[] $activationFunctions  The list of possible activation functions.
+     * @param callable[] $aggregationFunctions The list of possible aggregation functions.
      *
      * @return self
      */

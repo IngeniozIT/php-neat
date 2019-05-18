@@ -160,7 +160,7 @@ class NeatTest extends TestCase
         $this->expectException(\IngeniozIT\NEAT\Exceptions\NeatException::class);
         $neat->evaluation();
     }
-/*
+    /*
     public function testRunOnce()
     {
         $neat = new $this->className();
