@@ -1,5 +1,5 @@
 {
-    "name": "ingenioz-it/php-neat",
+    "name": "ingenioz-it/neat",
     "description": "A PHP implementation of the NeuroEvolution of Augmenting Topologies algorithm.",
     "keywords": ["NEAT", "NeuroEvolution of Augmenting Topologies", "genetic algorithm", "machine learning"],
     "type": "library",
