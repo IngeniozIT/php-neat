@@ -5,15 +5,31 @@ namespace IngeniozIT\Neat\Agents;
 
 use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
-use IngeniozIT\Neat\Genotype\Interfaces\SensorNodeGeneInterface;
-use IngeniozIT\Neat\Genotype\Interfaces\OutputNodeGeneInterface;
 
 class AgentFactory implements AgentFactoryInterface
 {
+    protected function getNewAgent(): AgentInterface
+    {
+        return new Agent();
+    }
+
+    protected function getNewGenome(): GenomeInterface
+    {
+        return new Genome();
+    }
+
+    public function createAgent(array $nodeGenes = [], array $connectGenes = []): AgentInterface
+    {
+        return $this->populateGenome($this->getNewAgent(), $nodeGenes, $connectGenes);
+    }
+
     public function createGenome(array $nodeGenes = [], array $connectGenes = []): GenomeInterface
     {
-        $genome = new Genome();
+        return $this->populateGenome($this->getNewGenome(), $nodeGenes, $connectGenes);
+    }
 
+    protected function populateGenome(GenomeInterface $genome, array $nodeGenes, array $connectGenes): GenomeInterface
+    {
         foreach ($nodeGenes as $nodeGene) {
             $genome->addNodeGene($nodeGene);
         }
@@ -24,7 +40,21 @@ class AgentFactory implements AgentFactoryInterface
         return $genome;
     }
 
+    public function createAgentFromParents(AgentInterface $parent1, AgentInterface $parent2): AgentInterface
+    {
+        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
+
+        return $this->createAgent($nodeGenes, $connectGenes);
+    }
+
     public function createGenomeFromParents(GenomeInterface $parent1, GenomeInterface $parent2): GenomeInterface
+    {
+        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
+
+        return $this->createGenome($nodeGenes, $connectGenes);
+    }
+
+    protected function getOffspringGenes(GenomeInterface $parent1, GenomeInterface $parent2): array
     {
         // Parent connexion genees
         $maxConnectInnovId = 0;
@@ -91,6 +121,6 @@ class AgentFactory implements AgentFactoryInterface
             }
         }
 
-        return $this->createGenome($offspringNodeGenes, $offspringConnectGenes);
+        return [$offspringNodeGenes, $offspringConnectGenes];
     }
 }
