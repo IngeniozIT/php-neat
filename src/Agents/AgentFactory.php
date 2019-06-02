@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace IngeniozIT\Neat\Agents;
 
 use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
+use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
 
 class AgentFactory implements AgentFactoryInterface
