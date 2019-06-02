@@ -8,9 +8,9 @@ namespace IngeniozIT\Neat\Tests\Genotype;
  */
 class ConnectGeneTest extends ConnectGenotypeTest
 {
-    protected function getObject($innovId, $inId = 1, $outId = 1, $weight = 0.0, $disabled = false)
+    protected function getObject($innovNb, $inId = 1, $outId = 1, $weight = 0.0, $disabled = false)
     {
-        return new \IngeniozIT\Neat\Genotype\ConnectGene($innovId, $inId, $outId, $weight, $disabled);
+        return new \IngeniozIT\Neat\Genotype\ConnectGene($innovNb, $inId, $outId, $weight, $disabled);
     }
 
     public function testConstruct()

@@ -5,5 +5,10 @@ namespace IngeniozIT\Neat\Genotype\Interfaces;
 
 interface InnovationGenotypeInterface
 {
-    public function innovId(): int;
+    /**
+     * Get the innovation number.
+     *
+     * @return int
+     */
+    public function innovNb(): int;
 }

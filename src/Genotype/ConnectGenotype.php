@@ -10,9 +10,9 @@ class ConnectGenotype extends InnovationGenotype implements ConnectGenotypeInter
     protected $inId;
     protected $outId;
 
-    public function __construct(int $innovId, int $inId, int $outId)
+    public function __construct(int $innovNb, int $inId, int $outId)
     {
-        parent::__construct($innovId);
+        parent::__construct($innovNb);
 
         $this->inId = $inId;
         $this->outId = $outId;

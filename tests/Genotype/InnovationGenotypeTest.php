@@ -10,11 +10,11 @@ use PHPUnit\Framework\TestCase;
  */
 class InnovationGenotypeTest extends TestCase
 {
-    protected function getObject($innovId)
+    protected function getObject($innovNb)
     {
         return $this->getMockForAbstractClass(
             \IngeniozIT\Neat\Genotype\InnovationGenotype::class,
-            [$innovId]
+            [$innovNb]
         );
     }
 
@@ -27,9 +27,9 @@ class InnovationGenotypeTest extends TestCase
     public function testInnovId()
     {
         $obj = $this->getObject(42);
-        $this->assertEquals(42, $obj->innovId());
+        $this->assertEquals(42, $obj->innovNb());
 
         $obj = $this->getObject(84);
-        $this->assertEquals(84, $obj->innovId());
+        $this->assertEquals(84, $obj->innovNb());
     }
 }

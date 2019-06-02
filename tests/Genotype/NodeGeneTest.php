@@ -8,10 +8,10 @@ namespace IngeniozIT\Neat\Tests\Genotype;
  */
 class NodeGeneTest extends NodeGenotypeTest
 {
-    protected function getObject($innovId, $type = 1, $aggregationFunction = [self::class, 'dummyAggregationFunction'], $activationFunction = [self::class, 'dummyActivationFunction'])
+    protected function getObject($innovNb, $type = 1, $aggregationFunction = [self::class, 'dummyAggregationFunction'], $activationFunction = [self::class, 'dummyActivationFunction'])
     {
         return new \IngeniozIT\Neat\Genotype\NodeGene(
-            $innovId,
+            $innovNb,
             $type,
             $aggregationFunction,
             $activationFunction
@@ -34,7 +34,7 @@ class NodeGeneTest extends NodeGenotypeTest
         };
         $obj = $this->getObject(42, 1, $aggregationFunction, $activationFunction);
         $this->assertSame($aggregationFunction, $obj->aggregationFunction());
-        $this->assertSame($activationFunction, $obj->activationFunction()); 
+        $this->assertSame($activationFunction, $obj->activationFunction());
     }
 
     public static function dummyAggregationFunction()

@@ -8,9 +8,9 @@ namespace IngeniozIT\Neat\Tests\Genotype;
  */
 class NodeGenotypeTest extends InnovationGenotypeTest
 {
-    protected function getObject($innovId, $type = 1)
+    protected function getObject($innovNb, $type = 1)
     {
-        return new \IngeniozIT\Neat\Genotype\NodeGenotype($innovId, $type);
+        return new \IngeniozIT\Neat\Genotype\NodeGenotype($innovNb, $type);
     }
 
     public function testConstruct()

@@ -10,9 +10,9 @@ class NodeGene extends NodeGenotype implements NodeGeneInterface
     protected $aggregationFunction;
     protected $activationFunction;
 
-    public function __construct(int $innovId, int $type, callable $aggregationFunction, callable $activationFunction)
+    public function __construct(int $innovNb, int $type, callable $aggregationFunction, callable $activationFunction)
     {
-        parent::__construct($innovId, $type);
+        parent::__construct($innovNb, $type);
 
         $this->aggregationFunction = $aggregationFunction;
         $this->activationFunction = $activationFunction;

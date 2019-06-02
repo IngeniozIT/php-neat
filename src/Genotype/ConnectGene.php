@@ -10,9 +10,9 @@ class ConnectGene extends ConnectGenotype implements ConnectGeneInterface
     protected $weight;
     protected $disabled;
 
-    public function __construct(int $innovId, int $inId, int $outId, float $weight, bool $disabled)
+    public function __construct(int $innovNb, int $inId, int $outId, float $weight, bool $disabled)
     {
-        parent::__construct($innovId, $inId, $outId);
+        parent::__construct($innovNb, $inId, $outId);
 
         $this->weight = $weight;
         $this->disabled = $disabled;

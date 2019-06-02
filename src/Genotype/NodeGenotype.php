@@ -14,16 +14,16 @@ class NodeGenotype extends InnovationGenotype implements NodeGenotypeInterface
 
     protected $type;
 
-    public function __construct(int $innovId, int $type)
+    public function __construct(int $innovNb, int $type)
     {
-        if ($type !== self::TYPE_SENSOR 
-            && $type !== self::TYPE_OUTPUT 
+        if ($type !== self::TYPE_SENSOR
+            && $type !== self::TYPE_OUTPUT
             && $type !== self::TYPE_HIDDEN
         ) {
             throw new InvalidArgumentException("Type $type is not a valid node type.");
         }
 
-        parent::__construct($innovId);
+        parent::__construct($innovNb);
         $this->type = $type;
     }
 

@@ -7,15 +7,15 @@ use IngeniozIT\Neat\Genotype\Interfaces\InnovationGenotypeInterface;
 
 abstract class InnovationGenotype implements InnovationGenotypeInterface
 {
-    protected $innovId;
+    protected $innovNb;
 
-    public function __construct(int $innovId)
+    public function __construct(int $innovNb)
     {
-        $this->innovId = $innovId;
+        $this->innovNb = $innovNb;
     }
 
-    public function innovId(): int
+    public function innovNb(): int
     {
-        return $this->innovId;
+        return $this->innovNb;
     }
 }

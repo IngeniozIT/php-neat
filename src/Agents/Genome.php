@@ -60,7 +60,7 @@ class Genome implements GenomeInterface
      */
     public function addNodeGene(NodeGeneInterface $nodeGene): void
     {
-        $innovId = $nodeGene->innovId();
+        $innovId = $nodeGene->innovNb();
 
         if (isset($this->nodeGenes[$innovId])) {
             throw new RuntimeException("Node gene with innovation $innovId already exists.");
@@ -84,7 +84,7 @@ class Genome implements GenomeInterface
      */
     public function addConnectGene(ConnectGeneInterface $connectGene): void
     {
-        $innovId = $connectGene->innovId();
+        $innovId = $connectGene->innovNb();
         $inId = $connectGene->inId();
         $outId = $connectGene->outId();
 
