@@ -12,22 +12,52 @@ use IngeniozIT\Neat\Exceptions\RuntimeException;
 
 class Genome implements GenomeInterface
 {
+    /**
+     * @var NodeGeneInterface[]
+     */
     protected $nodeGenes = [];
+
+    /**
+     * @var ConnectGeneInterface[]
+     */
     protected $connectGenes = [];
 
+    /**
+     * @var array
+     */
     protected $sensorNodes = [];
+
+    /**
+     * @var array
+     */
     protected $outputNodes = [];
 
+    /**
+     * Get the genome's node genes.
+     *
+     * @return NodeGeneInterface[]
+     */
     public function nodeGenes(): array
     {
         return $this->nodeGenes;
     }
 
+    /**
+     * Get the genome's connection genes.
+     *
+     * @return ConnectGeneInterface[]
+     */
     public function connectGenes(): array
     {
         return $this->connectGenes;
     }
 
+    /**
+     * Add a node gene to the genome.
+     *
+     * @param NodeGeneInterface $nodeGene [description]
+     * @throws RuntimeException If the genome already has a node gene with this innovation number.
+     */
     public function addNodeGene(NodeGeneInterface $nodeGene): void
     {
         $innovId = $nodeGene->innovId();
@@ -45,6 +75,13 @@ class Genome implements GenomeInterface
         }
     }
 
+    /**
+     * Add a connection gene to the genome.
+     *
+     * @param ConnectGeneInterface $nodeGene [description]
+     * @throws RuntimeException If the genome already has a connection gene with this innovation number.
+     * @throws RuntimeException If the genome is missing the input or output node.
+     */
     public function addConnectGene(ConnectGeneInterface $connectGene): void
     {
         $innovId = $connectGene->innovId();
@@ -64,28 +101,19 @@ class Genome implements GenomeInterface
         $this->connectGenes[$innovId] = $connectGene;
     }
 
+    /**
+     * Activate the neural network.
+     *
+     * @param  float[] $inputValues A list of input values.
+     *
+     * @return float[] A list of output values.
+     */
     public function activate(array $inputValues): array
     {
-        // Initialize nodes
-        $activations = [];
-        $aggregationFunctions = [];
-        $activationFunctions = [];
-        $pendingActivations = [];
-        foreach ($this->nodeGenes as $nodeGene) {
-            $innovId = $nodeGene->innovId();
-            $aggregationFunctions[$innovId] = $nodeGene->aggregationFunction();
-            $activationFunctions[$innovId] = $nodeGene->activationFunction();
-            if (isset($this->sensorNodes[$innovId])) {
-                $activations[$innovId] = [array_shift($inputValues)];
-                $pendingActivations[] = $innovId;
-            } else {
-                $activations[$innovId] = [];
-            }
-        }
-
         // Initialize connexions
         $connexions = [];
         foreach ($this->connectGenes as $connectGene) {
+            // Do not process disabled connection genes
             if ($connectGene->isDisabled()) {
                 continue;
             }
@@ -93,6 +121,27 @@ class Genome implements GenomeInterface
                 $connectGene->outId(),
                 $connectGene->weight()
             ];
+        }
+
+        // Initialize node activations
+        $activations = [];
+        $pendingActivations = [];
+        $aggregationFunctions = [];
+        $activationFunctions = [];
+        foreach ($this->nodeGenes as $innovId => $nodeGene) {
+            if (isset($this->sensorNodes[$innovId])) {
+                // Sensor node, activate it
+                $activations[$innovId] = [array_shift($inputValues)];
+                $pendingActivations[] = $innovId;
+            } elseif (isset($connexions[$innovId]) || isset($this->outputNodes[$innovId])) {
+                // Other node
+                $activations[$innovId] = [];
+            } else {
+                // Orphan node (or all out nodes are disabled)
+                continue;
+            }
+            $aggregationFunctions[$innovId] = $nodeGene->aggregationFunction();
+            $activationFunctions[$innovId] = $nodeGene->activationFunction();
         }
 
         // Activate neural network
@@ -108,9 +157,12 @@ class Genome implements GenomeInterface
                 $activations[$connexion[0]][$innovId] = $connexion[1] * $inActivation;
 
                 // Add out node to pending activations
-                if (!in_array($connexion[0], $pendingActivations) 
-                    && (                    null === $currentActivation 
-                    || abs($currentActivation - $activations[$connexion[0]][$innovId]) > 0.01)
+                if (
+                    !\in_array($connexion[0], $pendingActivations) &&
+                    (
+                        null === $currentActivation ||
+                        abs($currentActivation - $activations[$connexion[0]][$innovId]) > 0.01
+                    )
                 ) {
                     $pendingActivations[] = $connexion[0];
                 }
@@ -127,40 +179,52 @@ class Genome implements GenomeInterface
         return $outputs;
     }
 
-    public function toVector(int $nodeInnovation, int $connInnovation, array $aggregationFunctions, array $activationFunctions): array
+    /**
+     * Get a vector representation of the genome.
+     *
+     * @param  int $nodeInnovId The node global innovation number.
+     * @param  int $connInnovId The connection global innovation number.
+     * @param  callable[] $aggrFns The list of aggregation functions used amongst all genomes.
+     * @param  callable[] $actFns The list of activation functions used amongst all genomes.
+     *
+     * @return float[] A vector representing the genome.
+     * @throws RuntimeException If the genome has an aggregation function that is not present in $aggrFns.
+     * @throws RuntimeException If the genome has an activation function that is not present in $actFns.
+     */
+    public function toVector(int $nodeInnovId, int $connInnovId, array $aggrFns, array $actFns): array
     {
         $arr = [];
 
         // Nodes
-        $aggrFnNb = count($aggregationFunctions);
-        $actFnNb = count($activationFunctions);
-        for ($i = 1; $i <= $nodeInnovation; ++$i) {
+        $aggrFnNb = count($aggrFns);
+        $actFnNb = count($actFns);
+        for ($i = 1; $i <= $nodeInnovId; ++$i) {
             if (!isset($this->nodeGenes[$i])) {
                 // Node does not exist in this Genome
-                foreach ($aggregationFunctions as $aggrFn) {
+                foreach ($aggrFns as $aggrFn) {
                     $arr[] = 0;
                 }
-                foreach ($activationFunctions as $actFn) {
+                foreach ($actFns as $actFn) {
                     $arr[] = 0;
                 }
             } else {
                 // Aggregation functions
+                $aggrFnIndex = array_search($this->nodeGenes[$i]->aggregationFunction(), $aggrFns);
+                if (false === $aggrFnIndex) {
+                    throw new RuntimeException('Aggregation function not found.');
+                }
                 if ($aggrFnNb > 1) {
-                    $aggrFnIndex = array_search($this->nodeGenes[$i]->aggregationFunction(), $aggregationFunctions);
-                    if (false === $aggrFnIndex) {
-                        throw new RuntimeException('Aggregation function not found.');
-                    }
-                    foreach ($aggregationFunctions as $aggrFnId => $aggrFn) {
+                    foreach ($aggrFns as $aggrFnId => $aggrFn) {
                         $arr[] = $aggrFnId === $aggrFnIndex ? 1 : 0;
                     }
                 }
                 // Activation functions
+                $actFnIndex = array_search($this->nodeGenes[$i]->activationFunction(), $actFns);
+                if (false === $actFnIndex) {
+                    throw new RuntimeException('Activation function not found.');
+                }
                 if ($actFnNb > 1) {
-                    $actFnIndex = array_search($this->nodeGenes[$i]->activationFunction(), $activationFunctions);
-                    if (false === $actFnIndex) {
-                        throw new RuntimeException('Activation function not found.');
-                    }
-                    foreach ($activationFunctions as $actFnId => $actFn) {
+                    foreach ($actFns as $actFnId => $actFn) {
                         $arr[] = $actFnId === $actFnIndex ? 1 : 0;
                     }
                 }
@@ -168,7 +232,7 @@ class Genome implements GenomeInterface
         }
 
         // Connexions
-        for ($i = 1; $i <= $connInnovation; ++$i) {
+        for ($i = 1; $i <= $connInnovId; ++$i) {
             if (!isset($this->connectGenes[$i])) {
                 $arr[] = 0;
                 $arr[] = 0;

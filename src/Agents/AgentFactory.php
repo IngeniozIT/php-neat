@@ -9,26 +9,91 @@ use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
 
 class AgentFactory implements AgentFactoryInterface
 {
-    protected function getNewAgent(): AgentInterface
-    {
-        return new Agent();
-    }
-
-    protected function getNewGenome(): GenomeInterface
-    {
-        return new Genome();
-    }
-
+    /**
+     * Create an AgentInterface from genes.
+     *
+     * @param  NodeGeneInterface[] $nodeGenes The NodeGeneInterface items to add to the agent.
+     * @param  ConnectGeneInterface[] $connectGenes The ConnectGeneInterface items to add to the agent.
+     *
+     * @return AgentInterface
+     */
     public function createAgent(array $nodeGenes = [], array $connectGenes = []): AgentInterface
     {
         return $this->populateGenome($this->getNewAgent(), $nodeGenes, $connectGenes);
     }
 
+    /**
+     * Create an GenomeInterface from genes.
+     *
+     * @param  NodeGeneInterface[] $nodeGenes The NodeGeneInterface items to add to the genome.
+     * @param  ConnectGeneInterface[] $connectGenes The ConnectGeneInterface items to add to the genome.
+     *
+     * @return GenomeInterface
+     */
     public function createGenome(array $nodeGenes = [], array $connectGenes = []): GenomeInterface
     {
         return $this->populateGenome($this->getNewGenome(), $nodeGenes, $connectGenes);
     }
 
+    /**
+     * Create an AgentInterface from two AgentInterface parents.
+     *
+     * @param  AgentInterface $parent1 The most fit parent.
+     * @param  AgentInterface $parent2 The less fit parent.
+     *
+     * @return AgentInterface
+     */
+    public function createAgentFromParents(AgentInterface $parent1, AgentInterface $parent2): AgentInterface
+    {
+        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
+
+        return $this->createAgent($nodeGenes, $connectGenes);
+    }
+
+    /**
+     * Create an GenomeInterface from two GenomeInterface parents.
+     *
+     * @param  GenomeInterface $parent1 The most fit parent.
+     * @param  GenomeInterface $parent2 The less fit parent.
+     *
+     * @return GenomeInterface
+     */
+    public function createGenomeFromParents(GenomeInterface $parent1, GenomeInterface $parent2): GenomeInterface
+    {
+        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
+
+        return $this->createGenome($nodeGenes, $connectGenes);
+    }
+
+    /**
+     * Return a new instance of an AgentInterface.
+     *
+     * @return AgentInterface
+     */
+    protected function getNewAgent(): AgentInterface
+    {
+        return new Agent();
+    }
+
+    /**
+     * Return a new instance of a GenomeInterface.
+     *
+     * @return GenomeInterface
+     */
+    protected function getNewGenome(): GenomeInterface
+    {
+        return new Genome();
+    }
+
+    /**
+     * Add genes to a GenomeInterface.
+     *
+     * @param  GenomeInterface $genome
+     * @param  NodeGeneInterface[] $nodeGenes
+     * @param  ConnectGeneInterface[] $connectGenes
+     *
+     * @return GenomeInterface
+     */
     protected function populateGenome(GenomeInterface $genome, array $nodeGenes, array $connectGenes): GenomeInterface
     {
         foreach ($nodeGenes as $nodeGene) {
@@ -41,34 +106,29 @@ class AgentFactory implements AgentFactoryInterface
         return $genome;
     }
 
-    public function createAgentFromParents(AgentInterface $parent1, AgentInterface $parent2): AgentInterface
-    {
-        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
-
-        return $this->createAgent($nodeGenes, $connectGenes);
-    }
-
-    public function createGenomeFromParents(GenomeInterface $parent1, GenomeInterface $parent2): GenomeInterface
-    {
-        list($nodeGenes, $connectGenes) = $this->getOffspringGenes($parent1, $parent2);
-
-        return $this->createGenome($nodeGenes, $connectGenes);
-    }
-
+    /**
+     * Combine the genes from two parents.
+     * This method does not mutate the genes, it just selects which genes an offspring will inherit as explained in part
+     * 3.2 ("Tracking Genes through Historical Markings") and figure 4 of the original NEAT article.
+     *
+     * @link http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf
+     *
+     * @param  GenomeInterface $parent1 The most fit parent.
+     * @param  GenomeInterface $parent2 The less fit parent.
+     *
+     * @return array [NodeGeneInterface[], ConnectGeneInterface[]]
+     */
     protected function getOffspringGenes(GenomeInterface $parent1, GenomeInterface $parent2): array
     {
-        // Parent connexion genees
-        $maxConnectInnovId = 0;
+        // Get parents connect genes
         $parent1ConnectGenes = $parent1->connectGenes();
         $parent2ConnectGenes = $parent2->connectGenes();
-        foreach ($parent1ConnectGenes as $innovId => $connectGene) {
-            $maxConnectInnovId = max($maxConnectInnovId, $innovId);
-        }
-        foreach ($parent2ConnectGenes as $innovId => $connectGene) {
-            $maxConnectInnovId = max($maxConnectInnovId, $innovId);
-        }
+        $maxConnectInnovId = max(
+            max(array_keys($parent1ConnectGenes)),
+            max(array_keys($parent2ConnectGenes))
+        );
 
-        // Parent node genes
+        // Get parents node genes
         $maxNodeInnovId = 0;
         $mandatoryNodeGenes = [];
         $parent1NodeGenes = $parent1->nodeGenes();
@@ -86,40 +146,26 @@ class AgentFactory implements AgentFactoryInterface
             }
         }
 
-        // Offspring connect genes
+        // Select offspring connect genes and their corresponding node genes innovation ids
         $offspringConnectGenes = [];
         for ($i = 1; $i <= $maxConnectInnovId; ++$i) {
             if (!isset($parent1ConnectGenes[$i])) {
                 // Do not inherit gene
                 continue;
-            } elseif (isset($parent2ConnectGenes[$i])) {
-                // Inherit gene from either parent
-                $offspringConnectGenes[$i] = clone rand() % 2 ?
-                    $parent1ConnectGenes[$i] :
-                    $parent2ConnectGenes[$i];
-            } else {
-                // Inherit gene from most fit parent
-                $offspringConnectGenes[$i] = clone $parent1ConnectGenes[$i];
             }
+            $offspringConnectGenes[$i] = clone (isset($parent2ConnectGenes[$i]) && rand() % 2) ?
+                $parent2ConnectGenes[$i] :
+                $parent1ConnectGenes[$i];
             $mandatoryNodeGenes[$offspringConnectGenes[$i]->inId()] = true;
             $mandatoryNodeGenes[$offspringConnectGenes[$i]->outId()] = true;
         }
 
-        // Offspring node genes
+        // Select node genes so each connect gene can be attached to an in and out node
         $offspringNodeGenes = [];
-        for ($i = 1; $i <= $maxNodeInnovId; ++$i) {
-            if (!isset($mandatoryNodeGenes[$i])) {
-                // Do not inherit gene
-                continue;
-            } elseif (isset($parent2NodeGenes[$i])) {
-                // Inherit gene from either parent
-                $offspringNodeGenes[$i] = clone rand() % 2 ?
-                    $parent1NodeGenes[$i] :
-                    $parent2NodeGenes[$i];
-            } else {
-                // Inherit gene from most fit parent
-                $offspringNodeGenes[$i] = clone $parent1NodeGenes[$i];
-            }
+        foreach ($mandatoryNodeGenes as $innovId => $foo) {
+            $offspringConnectGenes[$innovId] = clone (isset($parent2NodeGenes[$innovId]) && rand() % 2) ?
+                $parent2NodeGenes[$innovId] :
+                $parent1NodeGenes[$innovId];
         }
 
         return [$offspringNodeGenes, $offspringConnectGenes];
