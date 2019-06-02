@@ -8,19 +8,19 @@ use PHPUnit\Framework\TestCase;
 use IngeniozIT\Math\ActivationFunction;
 
 /**
- * @coversDefaultClass \IngeniozIT\Neat\Agents\GenomeFactory
+ * @coversDefaultClass \IngeniozIT\Neat\Agents\AgentFactory
  */
-class GenomeFactoryTest extends TestCase
+class AgentFactoryTest extends TestCase
 {
     protected function getObject()
     {
-        return new \IngeniozIT\Neat\Agents\GenomeFactory();
+        return new \IngeniozIT\Neat\Agents\AgentFactory();
     }
 
     public function testConstruct()
     {
         $obj = $this->getObject();
-        $this->assertTrue($obj instanceof \IngeniozIT\Neat\Agents\GenomeFactory);
+        $this->assertTrue($obj instanceof \IngeniozIT\Neat\Agents\AgentFactory);
     }
 
     public function testCreateGenome()

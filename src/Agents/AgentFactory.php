@@ -3,12 +3,12 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Neat\Agents;
 
-use IngeniozIT\Neat\Agents\Interfaces\GenomeFactoryInterface;
+use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
 use IngeniozIT\Neat\Genotype\Interfaces\SensorNodeGeneInterface;
 use IngeniozIT\Neat\Genotype\Interfaces\OutputNodeGeneInterface;
 
-class GenomeFactory implements GenomeFactoryInterface
+class AgentFactory implements AgentFactoryInterface
 {
     public function createGenome(array $nodeGenes = [], array $connectGenes = []): GenomeInterface
     {
