@@ -12,19 +12,19 @@
     ],
     "require": {
         "php": ">=7.1",
-        "ingenioz-it/php-math": "^1.3"
+        "ingenioz-it/php-math": "^1.5"
     },
     "require-dev": {
         "phpunit/phpunit": "^7"
     },
     "autoload": {
         "psr-4": {
-            "IngeniozIT\\NEAT\\": "src/"
+            "IngeniozIT\\Neat\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "IngeniozIT\\NEAT\\Tests\\": "tests/"
+            "IngeniozIT\\Neat\\Tests\\": "tests/"
         }
     }
 }
