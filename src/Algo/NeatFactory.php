@@ -11,6 +11,8 @@ use IngeniozIT\Neat\Implementation\Speciation\OriginalSpeciation;
 use IngeniozIT\Neat\Threshold\Interfaces\ThresholdInterface;
 use IngeniozIT\Neat\Genotype\GenotypeFactory;
 use IngeniozIT\Neat\Agents\AgentFactory;
+use IngeniozIT\Neat\Algo\Pool;
+use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Math\ActivationFunction;
 
 class NeatFactory implements NeatFactoryInterface
@@ -37,9 +39,14 @@ class NeatFactory implements NeatFactoryInterface
         $this->agentFactory = new AgentFactory();
     }
 
+    public function createPool(int $nbInputs, int $nbOutputs, $populationSize): PoolInterface
+    {
+        return new Pool($nbInputs, $nbOutputs, $populationSize, $this->initializationMethod, $this->activationFunctions, $this->aggregationFunctions, $this->defaultActivationFunctions, $this->defaultAggregationFunctions, $this->genotypeFactory, $this->agentFactory);
+    }
+
     public function createNeat(int $nbInputs, int $nbOutputs, $populationSize, ThresholdInterface $threshold, callable $fitnessFunction): Neat
     {
-        $pool = new Pool($nbInputs, $nbOutputs, $populationSize, $this->initializationMethod, $this->activationFunctions, $this->aggregationFunctions, $this->defaultActivationFunctions, $this->defaultAggregationFunctions, $this->genotypeFactory, $this->agentFactory);
+        $pool = $this->createPool($nbInputs, $nbOutputs, $populationSize);
         $neat = new Neat($pool, $threshold, $fitnessFunction, $this->selectionFunction, $this->matingFunction, $this->speciationFunction);
 
         return $neat;

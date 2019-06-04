@@ -12,5 +12,5 @@ interface InitializationInterface
         PoolInterface &$pool,
         array $activationFunctions,
         array $aggregationFunctions
-    );
+    ): void;
 }

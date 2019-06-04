@@ -13,7 +13,7 @@ class FullyConnectedInitialization extends NotConnectedInitialization implements
         PoolInterface &$pool,
         array $activationFunctions,
         array $aggregationFunctions
-    )
+    ): void
     {
         parent::__invoke($pool, $activationFunctions, $aggregationFunctions);
         $this->addConnections($pool);

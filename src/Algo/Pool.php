@@ -7,6 +7,7 @@ use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Exceptions\InvalidArgumentException;
 use IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
+use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 
 class Pool implements PoolInterface
 {
@@ -15,6 +16,11 @@ class Pool implements PoolInterface
     protected $populationSize;
     protected $genotypeFactory;
     protected $agentFactory;
+
+    protected $sensorGenes = [];
+    protected $outputGenes = [];
+
+    protected $agents = [];
 
     public function __construct(
         int $nbInputs,
@@ -68,10 +74,53 @@ class Pool implements PoolInterface
         $this->genotypeFactory = $genotypeFactory;
         $this->agentFactory = $agentFactory;
 
+        for ($i = 1; $i <= $this->nbInputs; ++$i) {
+            $this->sensorGenes[$i] = $this->genotypeFactory->createSensorNodeGenotype($i);
+        }
+
+        for ($i = 1; $i <= $this->nbOutputs; ++$i) {
+            $this->outputGenes[$this->nbInputs + $i] = $this->genotypeFactory->createOutputNodeGenotype($this->nbInputs + $i);
+        }
+
         $initializationMethod(
             $this,
             $defaultActivationFunctions,
             $defaultAggregationFunctions
         );
+    }
+
+    public function sensorGenes(): array
+    {
+        return $this->sensorGenes;
+    }
+
+    public function outputGenes(): array
+    {
+        return $this->outputGenes;
+    }
+
+    public function genotypeFactory(): GenotypeFactoryInterface
+    {
+        return $this->genotypeFactory;
+    }
+
+    public function agentFactory(): AgentFactoryInterface
+    {
+        return $this->agentFactory;
+    }
+
+    public function count(): int
+    {
+        return count($this->agents);
+    }
+
+    public function populationSize(): int
+    {
+        return \is_int($this->populationSize) ? $this->populationSize : $this->populationSize();
+    }
+
+    public function addAgent(AgentInterface $agent): void
+    {
+        $this->agents[] = $agent;
     }
 }

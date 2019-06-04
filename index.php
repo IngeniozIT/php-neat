@@ -9,7 +9,7 @@ function fnFunc()
 
 }
 
-$neat = (new NeatFactory())->createNeat(3, 1, 100, new MinThreshold(0.05), 'fnFunc');
+$neat = (new NeatFactory())->createNeat(3, 1, 5, new MinThreshold(0.05), 'fnFunc');
 
 print_r($neat);
 
