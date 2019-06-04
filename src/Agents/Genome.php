@@ -191,7 +191,7 @@ class Genome implements GenomeInterface
      * @throws RuntimeException If the genome has an aggregation function that is not present in $aggrFns.
      * @throws RuntimeException If the genome has an activation function that is not present in $actFns.
      */
-    public function toVector(int $nodeInnovId, int $connInnovId, array $aggrFns, array $actFns): array
+    public function toVector(int $nodeInnovId, int $connInnovId, array $actFns, array $aggrFns): array
     {
         $arr = [];
 
@@ -201,11 +201,15 @@ class Genome implements GenomeInterface
         for ($i = 1; $i <= $nodeInnovId; ++$i) {
             if (!isset($this->nodeGenes[$i])) {
                 // Node does not exist in this Genome
-                foreach ($aggrFns as $aggrFn) {
-                    $arr[] = 0;
+                if ($aggrFnNb > 1) {
+                    foreach ($aggrFns as $aggrFn) {
+                        $arr[] = 0;
+                    }
                 }
-                foreach ($actFns as $actFn) {
-                    $arr[] = 0;
+                if ($actFnNb > 1) {
+                    foreach ($actFns as $actFn) {
+                        $arr[] = 0;
+                    }
                 }
             } else {
                 // Aggregation functions

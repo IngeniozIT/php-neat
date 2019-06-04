@@ -33,21 +33,21 @@ class AgentFactoryTest extends TestCase
             $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
                 $i,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                'array_sum',
-                [ActivationFunction::class, 'binaryStep']
+                [ActivationFunction::class, 'binaryStep'],
+                'array_sum'
             );
         }
         $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
             4,
             \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN,
-            'array_sum',
-            [ActivationFunction::class, 'binaryStep']
+            [ActivationFunction::class, 'binaryStep'],
+            'array_sum'
         );
         $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
             5,
             \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT,
-            'array_sum',
-            [ActivationFunction::class, 'binaryStep']
+            [ActivationFunction::class, 'binaryStep'],
+            'array_sum'
         );
 
         // Connexion genes
@@ -74,7 +74,7 @@ class AgentFactoryTest extends TestCase
             $this->assertEquals($xorCase[1], $genome->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, ['array_sum'], [[ActivationFunction::class, 'binaryStep']]));
+        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
     }
 
     public function testCreateAgent()
@@ -87,21 +87,21 @@ class AgentFactoryTest extends TestCase
             $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
                 $i,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                'array_sum',
-                [ActivationFunction::class, 'binaryStep']
+                [ActivationFunction::class, 'binaryStep'],
+                'array_sum'
             );
         }
         $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
             4,
             \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN,
-            'array_sum',
-            [ActivationFunction::class, 'binaryStep']
+            [ActivationFunction::class, 'binaryStep'],
+            'array_sum'
         );
         $nodeGenes[] = new \IngeniozIT\Neat\Genotype\NodeGene(
             5,
             \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT,
-            'array_sum',
-            [ActivationFunction::class, 'binaryStep']
+            [ActivationFunction::class, 'binaryStep'],
+            'array_sum'
         );
 
         // Connexion genes
@@ -128,6 +128,6 @@ class AgentFactoryTest extends TestCase
             $this->assertEquals($xorCase[1], $genome->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, ['array_sum'], [[ActivationFunction::class, 'binaryStep']]));
+        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
     }
 }

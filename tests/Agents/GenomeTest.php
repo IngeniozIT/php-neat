@@ -36,8 +36,8 @@ class GenomeTest extends TestCase
     public function testAddNodeGene()
     {
         $obj = $this->getObject();
-        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'array_sum', 'sqrt');
-        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(21, 2, 'array_sum', 'sqrt');
+        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'sqrt', 'array_sum');
+        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(21, 2, 'sqrt', 'array_sum');
 
         $obj->addNodeGene($nodeGene);
         $this->assertSame([42 => $nodeGene], $obj->nodeGenes());
@@ -48,8 +48,8 @@ class GenomeTest extends TestCase
     public function testAddExistingNodeGene()
     {
         $obj = $this->getObject();
-        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'array_sum', 'sqrt');
-        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(42, 2, 'array_sum', 'sqrt');
+        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'sqrt', 'array_sum');
+        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(42, 2, 'sqrt', 'array_sum');
 
         $obj->addNodeGene($nodeGene);
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
@@ -59,8 +59,8 @@ class GenomeTest extends TestCase
     public function testAddNodeGeneModifyGene()
     {
         $obj = $this->getObject();
-        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'array_sum', 'sqrt');
-        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(21, 2, 'array_sum', 'sqrt');
+        $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'sqrt', 'array_sum');
+        $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(21, 2, 'sqrt', 'array_sum');
 
         $obj->addNodeGene($nodeGene);
         $obj->addNodeGene($nodeGene2);
@@ -84,9 +84,9 @@ class GenomeTest extends TestCase
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
         $connGene2 = new \IngeniozIT\Neat\Genotype\ConnectGene(21, 2, 3, -42.42, false);
 
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'array_sum', 'sqrt'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'sqrt', 'array_sum'));
 
         $obj->addConnectGene($connGene);
         $this->assertSame([42 => $connGene], $obj->connectGenes());
@@ -100,9 +100,9 @@ class GenomeTest extends TestCase
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
         $connGene2 = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 2, 3, -42.42, false);
 
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'array_sum', 'sqrt'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'sqrt', 'array_sum'));
 
         $obj->addConnectGene($connGene);
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
@@ -114,7 +114,7 @@ class GenomeTest extends TestCase
         $obj = $this->getObject();
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
 
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'array_sum', 'sqrt'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'sqrt', 'array_sum'));
 
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
         $obj->addConnectGene($connGene);
@@ -125,7 +125,7 @@ class GenomeTest extends TestCase
         $obj = $this->getObject();
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
 
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'array_sum', 'sqrt'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'sqrt', 'array_sum'));
 
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
         $obj->addConnectGene($connGene);
@@ -137,9 +137,9 @@ class GenomeTest extends TestCase
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
         $connGene2 = new \IngeniozIT\Neat\Genotype\ConnectGene(21, 2, 3, -42.42, false);
 
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'array_sum', 'sqrt'));
-        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'array_sum', 'sqrt'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'sqrt', 'array_sum'));
+        $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(3, 1, 'sqrt', 'array_sum'));
 
         $obj->addConnectGene($connGene);
         $obj->addConnectGene($connGene2);
@@ -167,8 +167,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
@@ -176,16 +176,16 @@ class GenomeTest extends TestCase
             new \IngeniozIT\Neat\Genotype\NodeGene(
                 4,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN,
-                'array_sum',
-                [ActivationFunction::class, 'binaryStep']
+                [ActivationFunction::class, 'binaryStep'],
+                'array_sum'
             )
         );
         $obj->addNodeGene(
             new \IngeniozIT\Neat\Genotype\NodeGene(
                 5,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT,
-                'array_sum',
-                [ActivationFunction::class, 'binaryStep']
+                [ActivationFunction::class, 'binaryStep'],
+                'array_sum'
             )
         );
 
@@ -208,7 +208,19 @@ class GenomeTest extends TestCase
             $this->assertEquals($xorCase[1], $obj->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $obj->toVector(5, 6, ['array_sum'], [[ActivationFunction::class, 'binaryStep']]));
+        $this->assertEquals(
+            [1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15],
+            $obj->toVector(
+                5,
+                6,
+                [
+                    [ActivationFunction::class, 'binaryStep']
+                ],
+                [
+                    'array_sum'
+                ]
+            )
+        );
     }
 
     public function testXorFunctionWithDisabledNodes()
@@ -221,8 +233,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
@@ -231,8 +243,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
@@ -240,8 +252,8 @@ class GenomeTest extends TestCase
             new \IngeniozIT\Neat\Genotype\NodeGene(
                 6,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT,
-                'array_sum',
-                [ActivationFunction::class, 'binaryStep']
+                [ActivationFunction::class, 'binaryStep'],
+                'array_sum'
             )
         );
 
@@ -270,7 +282,19 @@ class GenomeTest extends TestCase
             $this->assertEquals($xorCase[1], $obj->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 15, 1, -15, 1, 10, 1, -10, 1, 10, 1, -10, 1, 10, 1, 10, 0, 100, 0, -100], $obj->toVector(6, 11, ['array_sum'], [[ActivationFunction::class, 'binaryStep']]));
+        $this->assertEquals(
+            [1, -5, 1, 15, 1, -15, 1, 10, 1, -10, 1, 10, 1, -10, 1, 10, 1, 10, 0, 100, 0, -100],
+            $obj->toVector(
+                6,
+                11,
+                [
+                    [ActivationFunction::class, 'binaryStep']
+                ],
+                [
+                    'array_sum'
+                ]
+            )
+        );
     }
 
     public function testToVectorWeirdNetwork()
@@ -283,8 +307,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_product',
-                    [ActivationFunction::class, 'identity']
+                    [ActivationFunction::class, 'identity'],
+                    'array_product'
                 )
             );
         }
@@ -293,8 +317,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
@@ -303,8 +327,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
@@ -312,8 +336,8 @@ class GenomeTest extends TestCase
             new \IngeniozIT\Neat\Genotype\NodeGene(
                 11,
                 \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT,
-                'array_sum',
-                [ActivationFunction::class, 'sigmoid']
+                [ActivationFunction::class, 'sigmoid'],
+                'array_sum'
             )
         );
 
@@ -383,7 +407,19 @@ class GenomeTest extends TestCase
             0, -100.0,
 
             0, 0
-            ], $obj->toVector(12, 17, ['array_sum', 'array_product'], [[ActivationFunction::class, 'identity'], [ActivationFunction::class, 'binaryStep'], [ActivationFunction::class, 'sigmoid']])
+            ], $obj->toVector(
+                12,
+                17,
+                [
+                    [ActivationFunction::class, 'identity'],
+                    [ActivationFunction::class, 'binaryStep'],
+                    [ActivationFunction::class, 'sigmoid']
+                ],
+                [
+                    'array_sum',
+                    'array_product'
+                ]
+            )
         );
     }
 
@@ -397,8 +433,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_product',
-                    [ActivationFunction::class, 'identity']
+                    [ActivationFunction::class, 'identity'],
+                    'array_product'
                 )
             );
         }
@@ -407,14 +443,26 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
 
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
-        $obj->toVector(10, 10, ['array_product', 'max'], [[ActivationFunction::class, 'identity'], [ActivationFunction::class, 'binaryStep'], [ActivationFunction::class, 'sigmoid']]);
+        $obj->toVector(
+            10,
+            10,
+            [
+                'array_product',
+                'max'
+            ],
+            [
+                [ActivationFunction::class, 'identity'],
+                [ActivationFunction::class, 'binaryStep'],
+                [ActivationFunction::class, 'sigmoid']
+            ]
+        );
     }
 
     public function testToVectorBadActivationFunction()
@@ -427,8 +475,8 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_product',
-                    [ActivationFunction::class, 'identity']
+                    [ActivationFunction::class, 'identity'],
+                    'array_product'
                 )
             );
         }
@@ -437,13 +485,24 @@ class GenomeTest extends TestCase
                 new \IngeniozIT\Neat\Genotype\NodeGene(
                     $i,
                     \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR,
-                    'array_sum',
-                    [ActivationFunction::class, 'binaryStep']
+                    [ActivationFunction::class, 'binaryStep'],
+                    'array_sum'
                 )
             );
         }
 
         $this->expectException(\IngeniozIT\Neat\Exceptions\RuntimeException::class);
-        $obj->toVector(10, 10, ['array_product', 'array_sum'], [[ActivationFunction::class, 'identity'], [ActivationFunction::class, 'sigmoid']]);
+        $obj->toVector(
+            10,
+            10,
+            [
+                [ActivationFunction::class, 'identity'],
+                [ActivationFunction::class, 'sigmoid']
+            ],
+            [
+                'array_product',
+                'array_sum'
+            ]
+        );
     }
 }
