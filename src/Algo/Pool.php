@@ -11,6 +11,8 @@ use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 
 class Pool implements PoolInterface
 {
+    use PoolTrait;
+
     protected $nbInputs;
     protected $nbOutputs;
     protected $populationSize;
@@ -19,8 +21,6 @@ class Pool implements PoolInterface
 
     protected $sensorGenes = [];
     protected $outputGenes = [];
-
-    protected $agents = [];
 
     public function __construct(
         int $nbInputs,
@@ -107,11 +107,6 @@ class Pool implements PoolInterface
     public function agentFactory(): AgentFactoryInterface
     {
         return $this->agentFactory;
-    }
-
-    public function count(): int
-    {
-        return count($this->agents);
     }
 
     public function populationSize(): int

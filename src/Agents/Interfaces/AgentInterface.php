@@ -18,4 +18,18 @@ interface AgentInterface extends GenomeInterface
      * @param ?float $fitness
      */
     public function setFitness(?float $fitness): void;
+
+    /**
+     * Get the species of the agent.
+     *
+     * @return int|null
+     */
+    public function species(): ?int;
+
+    /**
+     * Set the species of the agent.
+     *
+     * @param ?int $species
+     */
+    public function setSpecies(?int $species): void;
 }

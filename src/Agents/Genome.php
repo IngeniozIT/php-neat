@@ -18,9 +18,19 @@ class Genome implements GenomeInterface
     protected $nodeGenes = [];
 
     /**
+     * @var int
+     */
+    protected $maxNodeInnovNb = 0;
+
+    /**
      * @var ConnectGeneInterface[]
      */
     protected $connectGenes = [];
+
+    /**
+     * @var int
+     */
+    protected $maxConnectInnovNb = 0;
 
     /**
      * @var array
@@ -43,6 +53,16 @@ class Genome implements GenomeInterface
     }
 
     /**
+     * Get the maximum node gene innovation number.
+     *
+     * @return int
+     */
+    public function maxNodeInnovation(): int
+    {
+        return $this->maxNodeInnovNb;
+    }
+
+    /**
      * Get the genome's connection genes.
      *
      * @return ConnectGeneInterface[]
@@ -53,6 +73,16 @@ class Genome implements GenomeInterface
     }
 
     /**
+     * Get the maximum connection gene innovation number.
+     *
+     * @return int
+     */
+    public function maxConnectInnovation(): int
+    {
+        return $this->maxConnectInnovNb;
+    }
+
+    /**
      * Add a node gene to the genome.
      *
      * @param NodeGeneInterface $nodeGene [description]
@@ -60,18 +90,26 @@ class Genome implements GenomeInterface
      */
     public function addNodeGene(NodeGeneInterface $nodeGene): void
     {
-        $innovId = $nodeGene->innovNb();
+        $innovNb = $nodeGene->innovNb();
 
-        if (isset($this->nodeGenes[$innovId])) {
-            throw new RuntimeException("Node gene with innovation $innovId already exists.");
+        if (isset($this->nodeGenes[$innovNb])) {
+            throw new RuntimeException("Node gene with innovation $innovNb already exists.");
         }
 
-        $this->nodeGenes[$innovId] = $nodeGene;
+        $this->nodeGenes[$innovNb] = $nodeGene;
 
         if ($nodeGene->isSensor()) {
-            $this->sensorNodes[$innovId] = true;
+            $this->sensorNodes[$innovNb] = true;
         } elseif ($nodeGene->isOutput()) {
-            $this->outputNodes[$innovId] = true;
+            $this->outputNodes[$innovNb] = true;
+        }
+
+        if ($innovNb > $this->maxNodeInnovNb) {
+            $this->maxNodeInnovNb = $innovNb;
+        } else {
+            ksort($this->nodeGenes);
+            ksort($this->sensorNodes);
+            ksort($this->outputNodes);
         }
     }
 
@@ -84,12 +122,12 @@ class Genome implements GenomeInterface
      */
     public function addConnectGene(ConnectGeneInterface $connectGene): void
     {
-        $innovId = $connectGene->innovNb();
+        $innovNb = $connectGene->innovNb();
         $inId = $connectGene->inId();
         $outId = $connectGene->outId();
 
-        if (isset($this->connectGenes[$innovId])) {
-            throw new RuntimeException("Connect gene $innovId already exists.");
+        if (isset($this->connectGenes[$innovNb])) {
+            throw new RuntimeException("Connect gene $innovNb already exists.");
         }
         if (!isset($this->nodeGenes[$inId])) {
             throw new RuntimeException("Genome does not have In node gene $inId.");
@@ -98,7 +136,13 @@ class Genome implements GenomeInterface
             throw new RuntimeException("Genome does not have Out node gene $outId.");
         }
 
-        $this->connectGenes[$innovId] = $connectGene;
+        $this->connectGenes[$innovNb] = $connectGene;
+
+        if ($innovNb > $this->maxConnectInnovNb) {
+            $this->maxConnectInnovNb = $innovNb;
+        } else {
+            ksort($this->connectGenes);
+        }
     }
 
     /**
@@ -110,48 +154,54 @@ class Genome implements GenomeInterface
      */
     public function activate(array $inputValues): array
     {
-        // Initialize connexions
+        // Initialization
+        $activations = [];
         $connexions = [];
+        $pendingActivations = [];
+        $aggregationFunctions = [];
+        $activationFunctions = [];
         foreach ($this->connectGenes as $connectGene) {
             // Do not process disabled connection genes
             if ($connectGene->isDisabled()) {
                 continue;
             }
-            $connexions[$connectGene->inId()][] = [
-                $connectGene->outId(),
+
+            $inId = $connectGene->inId();
+            $outId = $connectGene->outId();
+
+            // Save connexion
+            $connexions[$inId][] = [
+                $outId,
                 $connectGene->weight()
             ];
-        }
 
-        // Initialize node activations
-        $activations = [];
-        $pendingActivations = [];
-        $aggregationFunctions = [];
-        $activationFunctions = [];
-        foreach ($this->nodeGenes as $innovId => $nodeGene) {
-            if (isset($this->sensorNodes[$innovId])) {
-                // Sensor node, activate it
-                $activations[$innovId] = [array_shift($inputValues)];
-                $pendingActivations[] = $innovId;
-            } elseif (isset($connexions[$innovId]) || isset($this->outputNodes[$innovId])) {
-                // Other node
-                $activations[$innovId] = [];
-            } else {
-                // Orphan node (or all out nodes are disabled)
-                continue;
-            }
-            $aggregationFunctions[$innovId] = $nodeGene->aggregationFunction();
-            $activationFunctions[$innovId] = $nodeGene->activationFunction();
+            // Initialize activation of in and out nodes
+            $activations[$inId] = [];
+            $activations[$outId] = [];
+        }
+        // Add initial sensor nodes activation
+        foreach ($this->sensorNodes as $innovId => $foo) {
+            $activations[$innovId] = [array_shift($inputValues) ?? 0];
+            $pendingActivations[] = $innovId;
+        }
+        // Add output nodes in case they were not linked
+        foreach ($this->outputNodes as $innovId => $foo) {
+            $activations[$innovId] = [];
+        }
+        // Save activation and aggregation functions
+        foreach ($activations as $innovId => $foo) {
+            $activationFunctions[$innovId] = $this->nodeGenes[$innovId]->activationFunction();
+            $aggregationFunctions[$innovId] = $this->nodeGenes[$innovId]->aggregationFunction();
         }
 
         // Activate neural network
         while (!empty($pendingActivations)) {
             $innovId = array_shift($pendingActivations);
 
-            // Activation of the input node
+            // Activation of input node
             $inActivation = $activationFunctions[$innovId]($aggregationFunctions[$innovId]($activations[$innovId]));
 
-            // Feed activation to all connexions
+            // Activate connexions
             foreach ($connexions[$innovId] ?? [] as $connexion) {
                 $currentActivation = $activations[$connexion[0]][$innovId] ?? null;
                 $activations[$connexion[0]][$innovId] = $connexion[1] * $inActivation;

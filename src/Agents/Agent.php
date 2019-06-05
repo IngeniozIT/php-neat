@@ -8,6 +8,7 @@ use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 class Agent extends Genome implements AgentInterface
 {
     protected $fitness = null;
+    protected $species = null;
 
     /**
      * Get the fitness of the agent.
@@ -27,5 +28,25 @@ class Agent extends Genome implements AgentInterface
     public function setFitness(?float $fitness): void
     {
         $this->fitness = $fitness;
+    }
+
+    /**
+     * Get the species of the agent.
+     *
+     * @return int|null
+     */
+    public function species(): ?int
+    {
+        return $this->species;
+    }
+
+    /**
+     * Set the species of the agent.
+     *
+     * @param ?int $species
+     */
+    public function setSpecies(?int $species): void
+    {
+        $this->species = $species;
     }
 }

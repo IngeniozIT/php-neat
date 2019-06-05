@@ -35,4 +35,19 @@ class AgentTest extends TestCase
         $obj->setFitness(null);
         $this->assertNull($obj->fitness());
     }
+
+    public function testSpecies()
+    {
+        $obj = $this->getObject();
+        $this->assertNull($obj->species());
+
+        $obj->setSpecies(42);
+        $this->assertEquals(42, $obj->species());
+
+        $obj->setSpecies(-42);
+        $this->assertEquals(-42, $obj->species());
+
+        $obj->setSpecies(null);
+        $this->assertNull($obj->species());
+    }
 }

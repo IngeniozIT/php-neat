@@ -10,7 +10,7 @@ use IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface;
 class FullyConnectedInitialization extends NotConnectedInitialization implements InitializationInterface
 {
     public function __invoke(
-        PoolInterface &$pool,
+        PoolInterface $pool,
         array $activationFunctions,
         array $aggregationFunctions
     ): void
@@ -19,7 +19,7 @@ class FullyConnectedInitialization extends NotConnectedInitialization implements
         $this->addConnections($pool);
     }
 
-    protected function addConnections(PoolInterface &$pool)
+    protected function addConnections(PoolInterface $pool)
     {
 
     }

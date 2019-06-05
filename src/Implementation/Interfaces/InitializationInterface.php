@@ -9,7 +9,7 @@ use IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface;
 interface InitializationInterface
 {
     public function __invoke(
-        PoolInterface &$pool,
+        PoolInterface $pool,
         array $activationFunctions,
         array $aggregationFunctions
     ): void;

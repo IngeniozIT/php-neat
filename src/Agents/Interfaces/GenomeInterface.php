@@ -16,11 +16,25 @@ interface GenomeInterface
     public function nodeGenes(): array;
 
     /**
+     * Get the maximum node gene innovation number.
+     *
+     * @return int
+     */
+    public function maxNodeInnovation(): int;
+
+    /**
      * Get the genome's connection genes.
      *
      * @return ConnectGeneInterface[]
      */
     public function connectGenes(): array;
+
+    /**
+     * Get the maximum connection gene innovation number.
+     *
+     * @return int
+     */
+    public function maxConnectInnovation(): int;
 
     /**
      * Add a node gene to the genome.

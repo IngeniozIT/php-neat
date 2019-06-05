@@ -9,12 +9,14 @@ use IngeniozIT\Neat\Exceptions\RuntimeException;
 class Neat extends NeatConfig implements NeatInterface
 {
     protected $pool;
+    protected $currentGeneration = 0;
+    protected $maxGenerations = null;
 
     public function run(): bool
     {
         $generation = 0;
 
-        while (++$generation <= $this->maxGenerations) {
+        while (null === $this->maxGenerations || ++$generation <= $this->maxGenerations) {
             if ($this->runOnce()) {
                 return true;
             }
@@ -36,6 +38,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function evaluate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         foreach ($pool as $agent) {
             $agent->setFitness(null);
@@ -50,6 +53,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function speciate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         $this->speciationFunction()($pool);
         foreach ($pool as $agent) {
@@ -61,8 +65,9 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function mate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
-        $this->selectingFunction()($pool);
+        $this->selectionFunction()($pool);
         $this->matingFunction()($pool);
         foreach ($pool as $agent) {
             if (null === $agent->species()) {

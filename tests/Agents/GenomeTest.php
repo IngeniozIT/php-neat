@@ -38,11 +38,17 @@ class GenomeTest extends TestCase
         $obj = $this->getObject();
         $nodeGene = new \IngeniozIT\Neat\Genotype\NodeGene(42, 1, 'sqrt', 'array_sum');
         $nodeGene2 = new \IngeniozIT\Neat\Genotype\NodeGene(21, 2, 'sqrt', 'array_sum');
+        $nodeGene3 = new \IngeniozIT\Neat\Genotype\NodeGene(84, 1, 'sqrt', 'array_sum');
 
         $obj->addNodeGene($nodeGene);
         $this->assertSame([42 => $nodeGene], $obj->nodeGenes());
+        $this->assertEquals(42, $obj->maxNodeInnovation());
         $obj->addNodeGene($nodeGene2);
-        $this->assertSame([42 => $nodeGene, 21 => $nodeGene2], $obj->nodeGenes());
+        $this->assertSame([21 => $nodeGene2, 42 => $nodeGene], $obj->nodeGenes());
+        $this->assertEquals(42, $obj->maxNodeInnovation());
+        $obj->addNodeGene($nodeGene3);
+        $this->assertSame([21 => $nodeGene2, 42 => $nodeGene, 84 => $nodeGene3], $obj->nodeGenes());
+        $this->assertEquals(84, $obj->maxNodeInnovation());
     }
 
     public function testAddExistingNodeGene()
@@ -83,6 +89,7 @@ class GenomeTest extends TestCase
         $obj = $this->getObject();
         $connGene = new \IngeniozIT\Neat\Genotype\ConnectGene(42, 1, 2, 42.42, false);
         $connGene2 = new \IngeniozIT\Neat\Genotype\ConnectGene(21, 2, 3, -42.42, false);
+        $connGene3 = new \IngeniozIT\Neat\Genotype\ConnectGene(84, 1, 3, -42.42, false);
 
         $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(1, 1, 'sqrt', 'array_sum'));
         $obj->addNodeGene(new \IngeniozIT\Neat\Genotype\NodeGene(2, 1, 'sqrt', 'array_sum'));
@@ -90,8 +97,13 @@ class GenomeTest extends TestCase
 
         $obj->addConnectGene($connGene);
         $this->assertSame([42 => $connGene], $obj->connectGenes());
+        $this->assertEquals(42, $obj->maxConnectInnovation());
         $obj->addConnectGene($connGene2);
-        $this->assertSame([42 => $connGene, 21 => $connGene2], $obj->connectGenes());
+        $this->assertSame([21 => $connGene2, 42 => $connGene], $obj->connectGenes());
+        $this->assertEquals(42, $obj->maxConnectInnovation());
+        $obj->addConnectGene($connGene3);
+        $this->assertSame([21 => $connGene2, 42 => $connGene, 84 => $connGene3], $obj->connectGenes());
+        $this->assertEquals(84, $obj->maxConnectInnovation());
     }
 
     public function testAddExistingConnectGene()

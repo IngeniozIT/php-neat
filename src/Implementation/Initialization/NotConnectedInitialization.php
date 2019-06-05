@@ -11,7 +11,7 @@ use IngeniozIT\Meth\Random;
 class NotConnectedInitialization implements InitializationInterface
 {
     public function __invoke(
-        PoolInterface &$pool,
+        PoolInterface $pool,
         array $activationFunctions,
         array $aggregationFunctions
     ): void
