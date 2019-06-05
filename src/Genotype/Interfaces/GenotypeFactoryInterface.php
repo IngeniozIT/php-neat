@@ -8,7 +8,7 @@ interface GenotypeFactoryInterface
     /**
      * Create a NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      * @param  int $type Node type. NodeGenotype::TYPE_SENSOR, NodeGenotype::TYPE_OUTPUT or NodeGenotype::TYPE_HIDDEN.
      *
      * @return NodeGenotypeInterface
@@ -18,7 +18,7 @@ interface GenotypeFactoryInterface
     /**
      * Create a sensor NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -27,7 +27,7 @@ interface GenotypeFactoryInterface
     /**
      * Create an output NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -36,7 +36,7 @@ interface GenotypeFactoryInterface
     /**
      * Create hidden NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -45,10 +45,10 @@ interface GenotypeFactoryInterface
     /**
      * Create a NodeGeneInterface.
      *
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      * @param  int $type Node type. NodeGenotype::TYPE_SENSOR, NodeGenotype::TYPE_OUTPUT or NodeGenotype::TYPE_HIDDEN.
      * @param  callable $activationFunction
      * @param  callable $aggregationFunction
-     * @param  int|null $innovNb Innovation number.
      *
      * @return NodeGeneInterface [description]
      */
@@ -72,4 +72,49 @@ interface GenotypeFactoryInterface
         NodeGenotypeInterface $nodeGenotype,
         callable $activationFunction,
         callable $aggregationFunction): NodeGeneInterface;
+
+    /**
+     * Create a ConnectGenotypeInterface.
+     *
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
+     *
+     * @return ConnectGenotypeInterface
+     */
+    public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ConnectGenotypeInterface;
+
+    /**
+     * Create a ConnectGeneInterface.
+     *
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
+     * @param float $weight Initial connection weight.
+     * @param bool $disabled True if the connection is disabled, false otherwise.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
+     *
+     * @return ConnectGeneInterface
+     */
+    public function createConnectGene(
+        int $inId,
+        int $outId,
+        float $weight,
+        bool $disabled = false,
+        ?int $innovNb = null
+    ): ConnectGeneInterface;
+
+    /**
+     * Create a ConnectGeneInterface from a ConnectGenotypeInterface.
+     *
+     * @param  ConnectGenotypeInterface $connectGenotype
+     * @param float $weight Initial connection weight.
+     * @param bool $disabled True if the connection is disabled, false otherwise.
+     *
+     * @return ConnectGeneInterface
+     */
+    public function createConnectGeneFromConnectGenotype(
+        ConnectGenotypeInterface $connectGenotype,
+        float $weight,
+        bool $disabled = false
+    ): ConnectGeneInterface;
 }

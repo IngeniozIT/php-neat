@@ -8,19 +8,18 @@ use IngeniozIT\Neat\Exceptions\InvalidArgumentException;
 
 class NodeGenotype extends InnovationGenotype implements NodeGenotypeInterface
 {
-    const TYPE_SENSOR = 0b001;
-    const TYPE_OUTPUT = 0b010;
-    const TYPE_HIDDEN = 0b100;
-
     /**
+     * Type of node (sensor, output, hidden).
+     *
      * @var int
+     * @internal
      */
     protected $type;
 
     /**
      * Constructor.
      *
-     * @param int $innovNb Innovation number
+     * @param int $innovNb Innovation number.
      * @param int $type The node type. Either NodeGenotype::NODE_SENSOR, NodeGenotype::NODE_OUTPUT or
      * NodeGenotype::NODE_HIDDEN.
      */

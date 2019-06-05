@@ -8,7 +8,10 @@ use IngeniozIT\Neat\Genotype\Interfaces\InnovationGenotypeInterface;
 abstract class InnovationGenotype implements InnovationGenotypeInterface
 {
     /**
+     * Innovation number.
+     *
      * @var int
+     * @internal
      */
     protected $innovNb;
 

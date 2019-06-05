@@ -15,13 +15,26 @@ use IngeniozIT\Neat\Genotype\ConnectGene;
 
 class GenotypeFactory implements GenotypeFactoryInterface
 {
+    /**
+     * The current maximum node innovation number.
+     *
+     * @var int
+     * @internal
+     */
     protected $currentGlobalNodeInnovNb = 0;
+
+    /**
+     * The current maximum connection innovation number.
+     *
+     * @var int
+     * @internal
+     */
     protected $currentGlobalConnectInnovNb = 0;
 
     /**
      * Create a NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      * @param  int $type Node type. NodeGenotype::TYPE_SENSOR, NodeGenotype::TYPE_OUTPUT or NodeGenotype::TYPE_HIDDEN.
      *
      * @return NodeGenotypeInterface
@@ -39,7 +52,7 @@ class GenotypeFactory implements GenotypeFactoryInterface
     /**
      * Create a sensor NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -51,7 +64,7 @@ class GenotypeFactory implements GenotypeFactoryInterface
     /**
      * Create an output NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -63,7 +76,7 @@ class GenotypeFactory implements GenotypeFactoryInterface
     /**
      * Create hidden NodeGenotypeInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      *
      * @return NodeGenotypeInterface
      */
@@ -75,7 +88,7 @@ class GenotypeFactory implements GenotypeFactoryInterface
     /**
      * Create a NodeGeneInterface.
      *
-     * @param  int|null $innovNb Innovation number.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
      * @param  int $type Node type. NodeGenotype::TYPE_SENSOR, NodeGenotype::TYPE_OUTPUT or NodeGenotype::TYPE_HIDDEN.
      * @param  callable $activationFunction
      * @param  callable $aggregationFunction
@@ -119,6 +132,15 @@ class GenotypeFactory implements GenotypeFactoryInterface
         );
     }
 
+    /**
+     * Create a ConnectGenotypeInterface.
+     *
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
+     *
+     * @return ConnectGenotypeInterface
+     */
     public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ConnectGenotypeInterface
     {
         if (null === $innovNb) {
@@ -129,6 +151,17 @@ class GenotypeFactory implements GenotypeFactoryInterface
         return new ConnectGenotype($innovNb, $inId, $outId);
     }
 
+    /**
+     * Create a ConnectGeneInterface.
+     *
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
+     * @param float $weight Initial connection weight.
+     * @param bool $disabled True if the connection is disabled, false otherwise.
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
+     *
+     * @return ConnectGeneInterface
+     */
     public function createConnectGene(
         int $inId,
         int $outId,
@@ -145,6 +178,15 @@ class GenotypeFactory implements GenotypeFactoryInterface
        return new ConnectGene($innovNb, $inId, $outId, $weight, $disabled);
     }
 
+    /**
+     * Create a ConnectGeneInterface from a ConnectGenotypeInterface.
+     *
+     * @param  ConnectGenotypeInterface $connectGenotype
+     * @param float $weight Initial connection weight.
+     * @param bool $disabled True if the connection is disabled, false otherwise.
+     *
+     * @return ConnectGeneInterface
+     */
     public function createConnectGeneFromConnectGenotype(
         ConnectGenotypeInterface $connectGenotype,
         float $weight,

@@ -22,14 +22,14 @@ interface ConnectGeneInterface extends ConnectGenotypeInterface
     /**
      * Check if the connection gene is disabled.
      *
-     * @return bool True if it is disabled, false otherwise
+     * @return bool True if it is disabled, false otherwise.
      */
     public function isDisabled(): bool;
 
     /**
      * Set the disabled state of the connection gene.
      *
-     * @param bool $disabled True to disable, false to enable
+     * @param bool $disabled True to disable, false to enable.
      */
     public function setDisabled(bool $disabled): void;
 }

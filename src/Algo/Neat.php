@@ -30,15 +30,16 @@ class Neat extends NeatConfig implements NeatInterface
         ++$this->currentGeneration;
 
         $this->evaluate();
+        if ($this->thresholdMet()) {
+            return true;
+        }
         $this->speciate();
         $this->mate();
-
-        return $this->thresholdMet();
+        return false;
     }
 
     public function evaluate(): void
     {
-        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         foreach ($pool as $agent) {
             $agent->setFitness(null);
@@ -54,7 +55,6 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function speciate(): void
     {
-        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         $this->speciationFunction()($pool);
         foreach ($pool as $agent) {
@@ -66,19 +66,16 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function mate(): void
     {
-        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         $this->selectionFunction()($pool);
         $this->matingFunction()($pool);
-        foreach ($pool as $agent) {
-            if (null === $agent->species()) {
-                throw new RuntimeException('Mating : agent without species found.');
-            }
+        if (count($pool) < $pool->populationSize()) {
+            throw new RuntimeException("Population size should be ".$pool->populationSize().", ".count($pool)." instead.");
         }
     }
 
     public function thresholdMet(): bool
     {
-        return $this->threshold()->thresholdMet($this->pool);
+        return $this->threshold()->thresholdMet($this->pool());
     }
 }

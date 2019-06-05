@@ -6,6 +6,27 @@ namespace IngeniozIT\Neat\Genotype\Interfaces;
 interface NodeGenotypeInterface extends InnovationGenotypeInterface
 {
     /**
+     * The type associated with a sensor (input) node.
+     *
+     * @var integer
+     */
+    const TYPE_SENSOR = 0b001;
+
+    /**
+     * The type associated with an output node.
+     *
+     * @var integer
+     */
+    const TYPE_OUTPUT = 0b010;
+
+    /**
+     * The type associated with a hidden node.
+     *
+     * @var integer
+     */
+    const TYPE_HIDDEN = 0b100;
+
+    /**
      * Get the type of the node.
      *
      * @return int Either NodeGenotype::NODE_SENSOR, NodeGenotype::NODE_OUTPUT or NodeGenotype::NODE_HIDDEN.

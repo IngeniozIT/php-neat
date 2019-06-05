@@ -8,21 +8,27 @@ use IngeniozIT\Neat\Genotype\Interfaces\ConnectGenotypeInterface;
 class ConnectGenotype extends InnovationGenotype implements ConnectGenotypeInterface
 {
     /**
+     * Innovation number of the input node.
+     *
      * @var int
+     * @internal
      */
     protected $inId;
 
     /**
+     * Innovation number of the output node.
+     *
      * @var int
+     * @internal
      */
     protected $outId;
 
     /**
      * Constructor.
      *
-     * @param int $innovNb Innovation number
-     * @param int $inId Innovation number of the input node
-     * @param int $outId Innovation number of the output node
+     * @param int $innovNb Innovation number.
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
      */
     public function __construct(int $innovNb, int $inId, int $outId)
     {

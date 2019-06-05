@@ -6,7 +6,6 @@ namespace IngeniozIT\Neat\Algo;
 trait PoolTrait
 {
     protected $agents = [];
-    protected $iteratorIndex = 0;
 
     public function count(): int
     {
@@ -15,26 +14,26 @@ trait PoolTrait
 
     public function current()
     {
-        return $this->agents[$this->iteratorIndex];
+        return current($this->agents);
     }
 
     public function key()
     {
-        return $this->iteratorIndex;
+        return key($this->agents);
     }
 
     public function next(): void
     {
-        ++$this->iteratorIndex;
+        next($this->agents);
     }
 
     public function rewind(): void
     {
-        $this->iteratorIndex = 0;
+        reset($this->agents);
     }
 
     public function valid(): bool
     {
-        return isset($this->agents[$this->iteratorIndex]);
+        return array_key_exists($this->key(), $this->agents);
     }
 }

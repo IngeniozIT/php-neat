@@ -8,23 +8,29 @@ use IngeniozIT\Neat\Genotype\Interfaces\ConnectGeneInterface;
 class ConnectGene extends ConnectGenotype implements ConnectGeneInterface
 {
     /**
+     * Connection weight.
+     *
      * @var float
+     * @internal
      */
     protected $weight;
 
     /**
+     * Connection disabled/enabled status.
+     *
      * @var bool
+     * @internal
      */
     protected $disabled;
 
     /**
      * Constructor.
      *
-     * @param int $innovNb Innovation number
-     * @param int $inId Innovation number of the input node
-     * @param int $outId Innovation number of the output node
-     * @param float $weight Initial connection weight
-     * @param bool $disabled True if the connection is disabled, false otherwise
+     * @param int $innovNb Innovation number.
+     * @param int $inId Innovation number of the input node.
+     * @param int $outId Innovation number of the output node.
+     * @param float $weight Initial connection weight.
+     * @param bool $disabled True if the connection is disabled, false otherwise.
      */
     public function __construct(int $innovNb, int $inId, int $outId, float $weight, bool $disabled)
     {
@@ -57,7 +63,7 @@ class ConnectGene extends ConnectGenotype implements ConnectGeneInterface
     /**
      * Check if the connection gene is disabled.
      *
-     * @return bool True if it is disabled, false otherwise
+     * @return bool True if it is disabled, false otherwise.
      */
     public function isDisabled(): bool
     {
@@ -67,7 +73,7 @@ class ConnectGene extends ConnectGenotype implements ConnectGeneInterface
     /**
      * Set the disabled state of the connection gene.
      *
-     * @param bool $disabled True to disable, false to enable
+     * @param bool $disabled True to disable, false to enable.
      */
     public function setDisabled(bool $disabled): void
     {

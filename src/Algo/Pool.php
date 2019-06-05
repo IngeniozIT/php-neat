@@ -170,6 +170,22 @@ class Pool implements PoolInterface
         $this->agents[] = $agent;
     }
 
+    public function agentNb(int $agentId): AgentInterface
+    {
+        if (!isset($this->agents[$agentId])) {
+            throw new RuntimeException("Agent $agentId does not exist.");
+        }
+        return $this->agents[$agentId];
+    }
+
+    public function removeAgent(int $agentId): void
+    {
+        if (!isset($this->agents[$agentId])) {
+            throw new RuntimeException("Agent $agentId does not exist.");
+        }
+        unset($this->agents[$agentId]);
+    }
+
     public function assignSpecies(int $speciesId, array $agentsIds): void
     {
         foreach ($agentsIds as $agentId) {
@@ -179,6 +195,13 @@ class Pool implements PoolInterface
 
     public function sort(ThresholdInterface $threshold): void
     {
-        uasort($this->agents, [$threshold, 'sort']);
+        usort($this->agents, [$threshold, 'sort']);
+    }
+
+    public function champion(): AgentInterface
+    {
+        foreach ($this->agents as $agent) {
+            return $agent;
+        }
     }
 }

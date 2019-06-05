@@ -7,6 +7,8 @@ use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 
 function xorFitness(PoolInterface $pool)
 {
+    $fitnesses = [];
+
     $xor = [
         [[0, 0], 0],
         [[0, 1], 1],
@@ -19,12 +21,17 @@ function xorFitness(PoolInterface $pool)
             $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
         }
         $agent->setFitness($fitness);
+        $fitnesses[$i] = $fitness;
     }
+
+    echo 'Min fitness : '.min($fitnesses), PHP_EOL;
+    echo 'Max fitness : '.max($fitnesses), PHP_EOL;
+    echo 'Avg fitness : '.(array_sum($fitnesses) / count($fitnesses)), PHP_EOL;
 }
 
 $neat = (new NeatFactory())->createNeat(3, 1, 20, new MinThreshold(0.05), 'xorFitness');
 
-$neat->run();
+var_dump($neat->run());
 /*
 $pool = new Pool(3, 1, 100);
 $neat = new Neat($pool);

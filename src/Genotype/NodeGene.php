@@ -8,19 +8,25 @@ use IngeniozIT\Neat\Genotype\Interfaces\NodeGeneInterface;
 class NodeGene extends NodeGenotype implements NodeGeneInterface
 {
     /**
+     *  Activation function.
+     *
      * @var callable
+     * @internal
      */
     protected $activationFunction;
 
     /**
+     *  Aggregation function function.
+     *
      * @var callable
+     * @internal
      */
     protected $aggregationFunction;
 
     /**
      * Constructor.
      *
-     * @param int $innovNb Innovation number
+     * @param int $innovNb Innovation number.
      * @param int $type The node type. Either NodeGenotype::NODE_SENSOR, NodeGenotype::NODE_OUTPUT or
      * NodeGenotype::NODE_HIDDEN.
      * @param callable $aggregationFunction The aggregation function that the node will use.
@@ -36,6 +42,7 @@ class NodeGene extends NodeGenotype implements NodeGeneInterface
 
     /**
      * Get the activation function of the node gene.
+     *
      * The activation function should look like "aggregationFunction(float $value): int|float".
      *
      * @return callable
@@ -47,6 +54,7 @@ class NodeGene extends NodeGenotype implements NodeGeneInterface
 
     /**
      * Set the activation function of the node gene.
+     *
      * The activation function should look like "aggregationFunction(float $value): int|float".
      *
      * @param callable $actFunction
@@ -58,6 +66,7 @@ class NodeGene extends NodeGenotype implements NodeGeneInterface
 
     /**
      * Get the aggregation function of the node gene.
+     *
      * The aggregation function should look like "aggregationFunction(array|iterable $values): int|float".
      *
      * @return callable
@@ -69,6 +78,7 @@ class NodeGene extends NodeGenotype implements NodeGeneInterface
 
     /**
      * Set the aggregation function of the node gene.
+     *
      * The aggregation function should look like "aggregationFunction(array|iterable $values): int|float".
      *
      * @param callable $aggrFunction

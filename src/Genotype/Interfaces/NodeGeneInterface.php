@@ -7,6 +7,7 @@ interface NodeGeneInterface extends NodeGenotypeInterface
 {
     /**
      * Get the activation function of the node gene.
+     *
      * The activation function should look like "aggregationFunction(float $value): int|float".
      *
      * @return callable
@@ -15,6 +16,7 @@ interface NodeGeneInterface extends NodeGenotypeInterface
 
     /**
      * Set the activation function of the node gene.
+     *
      * The activation function should look like "aggregationFunction(float $value): int|float".
      *
      * @param callable $actFunction
@@ -23,6 +25,7 @@ interface NodeGeneInterface extends NodeGenotypeInterface
 
     /**
      * Get the aggregation function of the node gene.
+     *
      * The aggregation function should look like "aggregationFunction(array|iterable $values): int|float".
      *
      * @return callable
@@ -31,6 +34,7 @@ interface NodeGeneInterface extends NodeGenotypeInterface
 
     /**
      * Set the aggregation function of the node gene.
+     *
      * The aggregation function should look like "aggregationFunction(array|iterable $values): int|float".
      *
      * @param callable $aggrFunction
