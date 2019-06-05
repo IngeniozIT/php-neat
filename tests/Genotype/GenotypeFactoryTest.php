@@ -20,6 +20,35 @@ class GenotypeFactoryTest extends TestCase
         $this->assertTrue($obj instanceof \IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface);
     }
 
+    public function testCreateNodeGenotype()
+    {
+        $obj = $this->getObject();
+
+        $nodeGenotype = $obj->createNodeGenotype(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR, 42);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
+        $this->assertEquals(42, $nodeGenotype->innovNb());
+        $this->assertTrue($nodeGenotype->isSensor());
+
+        $nodeGenotype = $obj->createNodeGenotype(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT, 42);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
+        $this->assertEquals(42, $nodeGenotype->innovNb());
+        $this->assertTrue($nodeGenotype->isOutput());
+
+        $nodeGenotype = $obj->createNodeGenotype(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN, 42);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
+        $this->assertEquals(42, $nodeGenotype->innovNb());
+        $this->assertTrue($nodeGenotype->isHidden());
+    }
+
+    public function testCreateNodeGenotypeNoInnovNb()
+    {
+        $obj = $this->getObject();
+        $nodeGenotype = $obj->createNodeGenotype(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR);
+        $nodeGenotype2 = $obj->createNodeGenotype(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR);
+
+        $this->assertNotEquals($nodeGenotype->innovNb(), $nodeGenotype2->innovNb());
+    }
+
     public function testCreateSensorNodeGenotype()
     {
         $obj = $this->getObject();
@@ -50,24 +79,40 @@ class GenotypeFactoryTest extends TestCase
         $this->assertTrue($nodeGenotype->isHidden());
     }
 
-    public function testCreateNodeGenotype()
+    public function testCreateNodeGene()
     {
         $obj = $this->getObject();
 
-        $nodeGenotype = $obj->createNodeGenotype(42, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR);
-        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
-        $this->assertEquals(42, $nodeGenotype->innovNb());
-        $this->assertTrue($nodeGenotype->isSensor());
+        $nodeGene = $obj->createNodeGene(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR, 'sqrt', 'array_sum', 21);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGeneInterface::class, $nodeGene);
+        $this->assertEquals(21, $nodeGene->innovNb());
+        $this->assertTrue($nodeGene->isSensor());
+        $this->assertSame('sqrt', $nodeGene->activationFunction());
+        $this->assertSame('array_sum', $nodeGene->aggregationFunction());
 
-        $nodeGenotype = $obj->createNodeGenotype(42, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT);
-        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
-        $this->assertEquals(42, $nodeGenotype->innovNb());
-        $this->assertTrue($nodeGenotype->isOutput());
+        $nodeGene = $obj->createNodeGene(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT, 'sqrt', 'array_product', 42);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGeneInterface::class, $nodeGene);
+        $this->assertEquals(42, $nodeGene->innovNb());
+        $this->assertTrue($nodeGene->isOutput());
+        $this->assertSame('sqrt', $nodeGene->activationFunction());
+        $this->assertSame('array_product', $nodeGene->aggregationFunction());
 
-        $nodeGenotype = $obj->createNodeGenotype(42, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN);
-        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGenotypeInterface::class, $nodeGenotype);
-        $this->assertEquals(42, $nodeGenotype->innovNb());
-        $this->assertTrue($nodeGenotype->isHidden());
+
+        $nodeGene = $obj->createNodeGene(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN, 'sqrt', 'array_sum', 84);
+        $this->assertInstanceOf(\IngeniozIT\Neat\Genotype\Interfaces\NodeGeneInterface::class, $nodeGene);
+        $this->assertEquals(84, $nodeGene->innovNb());
+        $this->assertTrue($nodeGene->isHidden());
+        $this->assertSame('sqrt', $nodeGene->activationFunction());
+        $this->assertSame('array_sum', $nodeGene->aggregationFunction());
+    }
+
+    public function testCreateNodeGeneNoInnovNb()
+    {
+        $obj = $this->getObject();
+        $nodeGene = $obj->createNodeGene(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN, 'sqrt', 'array_sum');
+        $nodeGene2 = $obj->createNodeGene(\IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN, 'sqrt', 'array_sum');
+
+        $this->assertNotEquals($nodeGene->innovNb(), $nodeGene2->innovNb());
     }
 
     public function testCreateNodeGeneFromNodeGenotype()
@@ -91,30 +136,6 @@ class GenotypeFactoryTest extends TestCase
 
         $nodeGenotype = $obj->createHiddenNodeGenotype(84);
         $nodeGene = $obj->createNodeGeneFromNodeGenotype($nodeGenotype, 'sqrt', 'array_sum');
-        $this->assertEquals(84, $nodeGene->innovNb());
-        $this->assertTrue($nodeGene->isHidden());
-        $this->assertSame('sqrt', $nodeGene->activationFunction());
-        $this->assertSame('array_sum', $nodeGene->aggregationFunction());
-    }
-
-    public function testCreateNodeGene()
-    {
-        $obj = $this->getObject();
-
-        $nodeGene = $obj->createNodeGene(21, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_SENSOR, 'sqrt', 'array_sum');
-        $this->assertEquals(21, $nodeGene->innovNb());
-        $this->assertTrue($nodeGene->isSensor());
-        $this->assertSame('sqrt', $nodeGene->activationFunction());
-        $this->assertSame('array_sum', $nodeGene->aggregationFunction());
-
-        $nodeGene = $obj->createNodeGene(42, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_OUTPUT, 'sqrt', 'array_product');
-        $this->assertEquals(42, $nodeGene->innovNb());
-        $this->assertTrue($nodeGene->isOutput());
-        $this->assertSame('sqrt', $nodeGene->activationFunction());
-        $this->assertSame('array_product', $nodeGene->aggregationFunction());
-
-
-        $nodeGene = $obj->createNodeGene(84, \IngeniozIT\Neat\Genotype\NodeGenotype::TYPE_HIDDEN, 'sqrt', 'array_sum'); 
         $this->assertEquals(84, $nodeGene->innovNb());
         $this->assertTrue($nodeGene->isHidden());
         $this->assertSame('sqrt', $nodeGene->activationFunction());

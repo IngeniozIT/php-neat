@@ -3,15 +3,26 @@ require_once 'vendor/autoload.php';
 
 use IngeniozIT\Neat\Algo\NeatFactory;
 use IngeniozIT\Neat\Threshold\MinThreshold;
+use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 
-function fnFunc($pool)
+function xorFitness(PoolInterface $pool)
 {
+    $xor = [
+        [[0, 0], 0],
+        [[0, 1], 1],
+        [[1, 0], 1],
+        [[1, 1], 0],
+    ];
     foreach ($pool as $i => $agent) {
-        $agent->setFitness($i + 1);
+        $fitness = 4;
+        foreach ($xor as $x) {
+            $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
+        }
+        $agent->setFitness($fitness);
     }
 }
 
-$neat = (new NeatFactory())->createNeat(3, 1, 5, new MinThreshold(0.05), 'fnFunc');
+$neat = (new NeatFactory())->createNeat(3, 1, 20, new MinThreshold(0.05), 'xorFitness');
 
 $neat->run();
 /*

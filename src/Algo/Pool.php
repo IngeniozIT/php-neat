@@ -8,6 +8,7 @@ use IngeniozIT\Neat\Exceptions\InvalidArgumentException;
 use IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
+use IngeniozIT\Neat\Threshold\Interfaces\ThresholdInterface;
 
 class Pool implements PoolInterface
 {
@@ -18,6 +19,9 @@ class Pool implements PoolInterface
     protected $populationSize;
     protected $genotypeFactory;
     protected $agentFactory;
+
+    protected $activationFunctions;
+    protected $aggregationFunctions;
 
     protected $sensorGenes = [];
     protected $outputGenes = [];
@@ -73,13 +77,15 @@ class Pool implements PoolInterface
         $this->populationSize = $populationSize;
         $this->genotypeFactory = $genotypeFactory;
         $this->agentFactory = $agentFactory;
+        $this->activationFunctions = $activationFunctions;
+        $this->aggregationFunctions = $aggregationFunctions;
 
         for ($i = 1; $i <= $this->nbInputs; ++$i) {
-            $this->sensorGenes[$i] = $this->genotypeFactory->createSensorNodeGenotype($i);
+            $this->sensorGenes[$i] = $this->genotypeFactory->createSensorNodeGenotype(null);
         }
 
         for ($i = 1; $i <= $this->nbOutputs; ++$i) {
-            $this->outputGenes[$this->nbInputs + $i] = $this->genotypeFactory->createOutputNodeGenotype($this->nbInputs + $i);
+            $this->outputGenes[$this->nbInputs + $i] = $this->genotypeFactory->createOutputNodeGenotype(null);
         }
 
         $initializationMethod(
@@ -87,6 +93,16 @@ class Pool implements PoolInterface
             $defaultActivationFunctions,
             $defaultAggregationFunctions
         );
+    }
+
+    public function nbInputs(): int
+    {
+        return $this->nbInputs;
+    }
+
+    public function nbOutputs(): int
+    {
+        return $this->nbOutputs;
     }
 
     public function sensorGenes(): array
@@ -114,8 +130,55 @@ class Pool implements PoolInterface
         return \is_int($this->populationSize) ? $this->populationSize : $this->populationSize();
     }
 
+    public function maxNodeInnovation(): int
+    {
+        $max = 0;
+        foreach ($this->agents as $agent) {
+            $max = max($max, $agent->maxNodeInnovation());
+        }
+        return $max;
+    }
+
+    public function maxConnectInnovation(): int
+    {
+        $max = 0;
+        foreach ($this->agents as $agent) {
+            $max = max($max, $agent->maxConnectInnovation());
+        }
+        return $max;
+    }
+
+    public function vectors(): array
+    {
+        $maxNodeInnovNb = $this->maxNodeInnovation();
+        $maxConnectInnovNb = $this->maxConnectInnovation();
+
+        $vectors = [];
+        foreach ($this->agents as $id => $agent) {
+            $vectors[$id] = $agent->toVector(
+                $maxNodeInnovNb,
+                $maxConnectInnovNb,
+                $this->activationFunctions,
+                $this->aggregationFunctions
+            );
+        }
+        return $vectors;
+    }
+
     public function addAgent(AgentInterface $agent): void
     {
         $this->agents[] = $agent;
+    }
+
+    public function assignSpecies(int $speciesId, array $agentsIds): void
+    {
+        foreach ($agentsIds as $agentId) {
+            $this->agents[$agentId]->setSpecies($speciesId);
+        }
+    }
+
+    public function sort(ThresholdInterface $threshold): void
+    {
+        uasort($this->agents, [$threshold, 'sort']);
     }
 }

@@ -49,6 +49,7 @@ class Neat extends NeatConfig implements NeatInterface
                 throw new RuntimeException('Evaluation : agent without fitness found.');
             }
         }
+        $pool->sort($this->threshold());
     }
 
     public function speciate(): void
