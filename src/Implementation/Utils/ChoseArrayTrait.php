@@ -8,11 +8,11 @@ trait ChoseArrayTrait
     /**
      * Chose a random index from the given array.
      *
-     * @param  array $array
+     * @param  iterable $array
      *
      * @return int The chosen index.
      */
-    protected function choseArrayIndex(array $array): int
+    protected function choseArrayIndex(iterable $array): int
     {
         $count = count($array);
         $chosen = rand(1, $count);
@@ -26,11 +26,11 @@ trait ChoseArrayTrait
     /**
      * Chose a random value from the given array.
      *
-     * @param  array $array
+     * @param  iterable $array
      *
      * @return mixed The chosen value.
      */
-    protected function choseArrayValue(array $array)
+    protected function choseArrayValue(iterable $array)
     {
         $count = count($array);
         $chosen = rand(1, $count);

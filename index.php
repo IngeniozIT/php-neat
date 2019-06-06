@@ -5,6 +5,7 @@ use IngeniozIT\Neat\Algo\NeatFactory;
 use IngeniozIT\Neat\Threshold\MaxThreshold;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Implementation\Speciation\OriginalSpeciation;
+use IngeniozIT\Math\ActivationFunction;
 
 function xorFitness(PoolInterface $pool)
 {
@@ -17,25 +18,42 @@ function xorFitness(PoolInterface $pool)
         [[1, 1], 0],
     ];
     foreach ($pool as $i => $agent) {
-        $fitness = 0;
+        $fitness = 4;
         foreach ($xor as $x) {
-            $fitness += abs($agent->activate($x[0])[0] - $x[1]);
+            $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
         }
+        $fitness /= 4;
         $agent->setFitness($fitness);
         $fitnesses[$i] = $fitness;
     }
 
+    // foreach ($pool->getSpecies() as $speciesId => $agents) {
+    //     echo '- ', $speciesId, ' => ', count($agents), PHP_EOL;
+    // }
     echo 'Min fitness : '.min($fitnesses), PHP_EOL;
     echo 'Max fitness : '.max($fitnesses), PHP_EOL;
     echo 'Avg fitness : '.(array_sum($fitnesses) / count($fitnesses)), PHP_EOL;
+    echo PHP_EOL;
+}
+
+function customSigmoid(float $val): float
+{
+    return 1 / (1 + exp(-4.9 * $val));
 }
 
 $factory = new NeatFactory();
 $factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
-$neat = $factory->createNeat(3, 1, 50, new MaxThreshold(3.95), 'xorFitness');
-$neat->setMaxGenerations(500);
+$factory->setActivationFunctions(['customSigmoid']);
+$factory->setDefaultActivationFunction(['customSigmoid']);
+// $factory->setActivationFunctions([[ActivationFunction::class, 'binaryStep']]);
+// $factory->setDefaultActivationFunction([[ActivationFunction::class, 'binaryStep']]);
+// $factory->setActivationFunctions(['customSigmoid', [ActivationFunction::class, 'binaryStep']]);
+$factory->setDefaultActivationFunction(['customSigmoid']);
+$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(1), 'xorFitness');
+$neat->setMaxGenerations(200);
 
 var_dump($neat->run());
+echo $neat->pool()->champion();
 /*
 $pool = new Pool(3, 1, 100);
 $neat = new Neat($pool);

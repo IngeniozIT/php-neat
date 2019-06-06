@@ -82,7 +82,7 @@ interface GenotypeFactoryInterface
      *
      * @return ConnectGenotypeInterface
      */
-    public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ConnectGenotypeInterface;
+    public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ?ConnectGenotypeInterface;
 
     /**
      * Create a ConnectGeneInterface.
@@ -101,7 +101,7 @@ interface GenotypeFactoryInterface
         float $weight,
         bool $disabled = false,
         ?int $innovNb = null
-    ): ConnectGeneInterface;
+    ): ?ConnectGeneInterface;
 
     /**
      * Create a ConnectGeneInterface from a ConnectGenotypeInterface.

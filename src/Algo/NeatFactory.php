@@ -42,6 +42,16 @@ class NeatFactory implements NeatFactoryInterface
         $this->speciationFunction = $speciationFunction;
     }
 
+    public function setActivationFunctions(array $activationFunctions): void
+    {
+        $this->activationFunctions = $activationFunctions;
+    }
+
+    public function setDefaultActivationFunction(array $activationFunctions): void
+    {
+        $this->defaultActivationFunctions = $activationFunctions;
+    }
+
     public function createPool(int $nbInputs, int $nbOutputs, $populationSize): PoolInterface
     {
         return new Pool($nbInputs, $nbOutputs, $populationSize, $this->initializationMethod, $this->activationFunctions, $this->aggregationFunctions, $this->defaultActivationFunctions, $this->defaultAggregationFunctions, $this->genotypeFactory, $this->agentFactory);

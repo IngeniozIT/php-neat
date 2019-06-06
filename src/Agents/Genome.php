@@ -298,11 +298,12 @@ class Genome implements GenomeInterface
         // Connexions
         for ($i = 1; $i <= $connInnovId; ++$i) {
             if (!isset($this->connectGenes[$i])) {
-                $arr[] = 0;
+                // $arr[] = 0;
                 $arr[] = 0;
             } else {
-                $arr[] = $this->connectGenes[$i]->isDisabled() ? 0 : 1;
-                $arr[] = $this->connectGenes[$i]->weight();
+                $arr[] = $this->connectGenes[$i]->isDisabled() ? 0 : $this->connectGenes[$i]->weight();
+                // $arr[] = $this->connectGenes[$i]->isDisabled() ? 0 : 1;
+                // $arr[] = $this->connectGenes[$i]->weight();
             }
         }
 

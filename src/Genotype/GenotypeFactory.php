@@ -31,6 +31,21 @@ class GenotypeFactory implements GenotypeFactoryInterface
      */
     protected $currentGlobalConnectInnovNb = 0;
 
+    protected $connections = [];
+    protected $nodes = [];
+    protected $loopDetect = [];
+
+    protected function addLoopDetect(int $outId, int $inId): void
+    {
+        $this->loopDetect[$outId][$inId] = true;
+        foreach ($this->loopDetect[$inId] ?? [] as $nextInId => $foo) {
+            if ($nextInId === $inId || isset($this->loopDetect[$outId][$nextInId])) {
+                continue;
+            }
+            $this->addLoopDetect($outId, $nextInId);
+        }
+    }
+
     /**
      * Create a NodeGenotypeInterface.
      *
@@ -47,6 +62,35 @@ class GenotypeFactory implements GenotypeFactoryInterface
             $this->currentGlobalNodeInnovNb = max($this->currentGlobalNodeInnovNb, $innovNb);
         }
         return new NodeGenotype($innovNb, $type);
+    }
+
+    public function splitConnectGene(ConnectGeneInterface $connectGene, callable $activationFunction, callable $aggregationFunction): array
+    {
+        $inId = $connectGene->inId();
+        $outId = $connectGene->outId();
+        $weight = $connectGene->weight();
+        $innovNb = isset($this->nodes[$inId], $this->nodes[$inId][$outId]) ?
+            $this->nodes[$inId][$outId] :
+            null;
+
+        $newNode = $this->createHiddenNodeGene(
+            $activationFunction,
+            $aggregationFunction,
+            $innovNb
+        );
+        $this->nodes[$inId][$outId] = $newNode->innovNb();
+        $newConnection1 = $this->createConnectGene(
+            $inId,
+            $this->nodes[$inId][$outId],
+            $weight
+        );
+        $newConnection2 = $this->createConnectGene(
+            $this->nodes[$inId][$outId],
+            $outId,
+            $weight
+        );
+
+        return [$newNode, [$newConnection1, $newConnection2]];
     }
 
     /**
@@ -111,6 +155,22 @@ class GenotypeFactory implements GenotypeFactoryInterface
     }
 
     /**
+     * Create hidden NodeGeneInterface.
+     *
+     * @param  int|null $innovNb Innovation number. If null is given a new innovation number will be given.
+     *
+     * @return NodeGeneInterface
+     */
+    public function createHiddenNodeGene(
+        callable $activationFunction,
+        callable $aggregationFunction,
+        ?int $innovNb = null
+    ): NodeGeneInterface
+    {
+        return $this->createNodeGene(NodeGenotype::TYPE_HIDDEN, $activationFunction, $aggregationFunction, $innovNb);
+    }
+
+    /**
      * Create a NodeGeneInterface from a NodeGenotypeInterface.
      *
      * @param  NodeGenotypeInterface $nodeGenotype
@@ -141,13 +201,22 @@ class GenotypeFactory implements GenotypeFactoryInterface
      *
      * @return ConnectGenotypeInterface
      */
-    public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ConnectGenotypeInterface
+    public function createConnectGenotype(int $inId, int $outId, ?int $innovNb = null): ?ConnectGenotypeInterface
     {
+        if (isset($this->loopDetect[$inId], $this->loopDetect[$inId][$outId])) {
+            return null;
+        }
         if (null === $innovNb) {
-            $innovNb = ++$this->currentGlobalConnectInnovNb;
+            if (isset($this->connections[$inId], $this->connections[$inId][$outId])) {
+                $innovNb = $this->connections[$inId][$outId];
+            } else {
+                $innovNb = ++$this->currentGlobalConnectInnovNb;
+            }
         } else {
             $this->currentGlobalConnectInnovNb = max($this->currentGlobalConnectInnovNb, $innovNb);
         }
+        $this->connections[$inId][$outId] = $innovNb;
+        $this->addLoopDetect($outId, $inId);
         return new ConnectGenotype($innovNb, $inId, $outId);
     }
 
@@ -168,14 +237,23 @@ class GenotypeFactory implements GenotypeFactoryInterface
         float $weight,
         bool $disabled = false,
         ?int $innovNb = null
-    ): ConnectGeneInterface
+    ): ?ConnectGeneInterface
     {
-       if (null === $innovNb) {
-           $innovNb = ++$this->currentGlobalConnectInnovNb;
-       } else {
-           $this->currentGlobalConnectInnovNb = max($this->currentGlobalConnectInnovNb, $innovNb);
-       }
-       return new ConnectGene($innovNb, $inId, $outId, $weight, $disabled);
+        if (isset($this->loopDetect[$inId], $this->loopDetect[$inId][$outId])) {
+            return null;
+        }
+        if (null === $innovNb) {
+            if (isset($this->connections[$inId], $this->connections[$inId][$outId])) {
+                $innovNb = $this->connections[$inId][$outId];
+            } else {
+                $innovNb = ++$this->currentGlobalConnectInnovNb;
+            }
+        } else {
+            $this->currentGlobalConnectInnovNb = max($this->currentGlobalConnectInnovNb, $innovNb);
+        }
+        $this->connections[$inId][$outId] = $innovNb;
+        $this->addLoopDetect($outId, $inId);
+        return new ConnectGene($innovNb, $inId, $outId, $weight, $disabled);
     }
 
     /**

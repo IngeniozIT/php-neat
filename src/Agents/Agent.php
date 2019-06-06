@@ -49,4 +49,18 @@ class Agent extends Genome implements AgentInterface
     {
         $this->species = $species;
     }
+
+    public function __toString(): string
+    {
+        $arr = [
+            'species' => $this->species()
+        ];
+        foreach ($this->nodeGenes() as $nodeGene) {
+            $arr['nodes'][] = $nodeGene->innovNb();
+        }
+        foreach ($this->connectGenes as $conn) {
+            $arr['connect'][] = $conn->innovNb().' '.$conn->inId().' '.$conn->outId().' '.$conn->weight().' '.$conn->isDisabled();
+        }
+        return json_encode($arr, JSON_PRETTY_PRINT);
+    }
 }

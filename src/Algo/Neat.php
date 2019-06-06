@@ -22,6 +22,7 @@ class Neat extends NeatConfig implements NeatInterface
         $generation = 0;
 
         while (null === $this->maxGenerations || ++$generation <= $this->maxGenerations) {
+            echo 'GENERATION ', $generation, ' ', $this->pool->maxNodeInnovation(), ' ', $this->pool->maxConnectInnovation(), PHP_EOL;
             if ($this->runOnce()) {
                 return true;
             }
@@ -45,6 +46,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function evaluate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         foreach ($pool as $agent) {
             $agent->setFitness(null);
@@ -60,6 +62,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function speciate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         $this->speciationFunction()($pool);
         foreach ($pool as $agent) {
@@ -71,6 +74,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function mate(): void
     {
+        echo __FUNCTION__, PHP_EOL;
         $pool = $this->pool();
         $this->matingFunction()($pool);
         if (count($pool) < $pool->populationSize()) {
@@ -80,6 +84,7 @@ class Neat extends NeatConfig implements NeatInterface
 
     public function thresholdMet(): bool
     {
+        echo __FUNCTION__, PHP_EOL;
         return $this->threshold()->thresholdMet($this->pool());
     }
 }
