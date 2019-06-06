@@ -16,7 +16,7 @@ class MaxThreshold implements ThresholdInterface
         $this->threshold = $threshold;
     }
 
-    public function thresholdMet(PoolInterface $pool): bool;
+    public function thresholdMet(PoolInterface $pool): bool
     {
         foreach ($pool as $agent) {
             if ($agent->fitness() >= $this->threshold) {

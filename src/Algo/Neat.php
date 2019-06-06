@@ -67,7 +67,6 @@ class Neat extends NeatConfig implements NeatInterface
     public function mate(): void
     {
         $pool = $this->pool();
-        $this->selectionFunction()($pool);
         $this->matingFunction()($pool);
         if (count($pool) < $pool->populationSize()) {
             throw new RuntimeException("Population size should be ".$pool->populationSize().", ".count($pool)." instead.");

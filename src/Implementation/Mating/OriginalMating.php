@@ -6,6 +6,7 @@ namespace IngeniozIT\Neat\Implementation\Mating;
 use IngeniozIT\Neat\Implementation\Interfaces\MatingInterface;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
+use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 use IngeniozIT\Math\Random;
 
 class OriginalMating implements MatingInterface
@@ -13,30 +14,125 @@ class OriginalMating implements MatingInterface
     public function __invoke(PoolInterface $pool): void
     {
         $agentFactory = $pool->agentFactory();
-        $popSize = $pool->populationSize();
 
-        $champion = $pool->agentNb(0);
+        $this->removeAgents($pool);
+        $species = $this->getSpecies($pool);
+        $offspringsNb = $this->getNbOffsprings($species, $pool->populationSize());
 
-        $passed = false;
-        while (count($pool) < $popSize) {
-            foreach ($pool as $agent) {
-                if (count($pool) >= $popSize) {
-                    return;
-                }
-                if (!$passed) {
-                    $passed = true;
-                    continue;
-                }
-                echo 'Adding new agent', PHP_EOL;
-                list($nodeGenes, $connectGenes) = $this->getOffspringGenes($champion, $agent);
+        foreach ($offspringsNb as $speciesId => $targetPopSize) {
+            $popSizeDelta = count($species[$speciesId]) - $targetPopSize;
+            while ($popSizeDelta < 0) {
+                $parent1 = $pool->agentNb($this->choseParent($species[$speciesId]));
+                $parent2 = $pool->agentNb($this->choseParent($species[$speciesId]));
 
+                list($nodeGenes, $connectGenes) = $parent1->fitness() > $parent2->fitness() ?
+                    $this->getOffspringGenes($parent1, $parent2) :
+                    $this->getOffspringGenes($parent2, $parent1);
                 $connectGenesNb = count($connectGenes);
                 foreach ($connectGenes as $connectGene) {
                     if (Random::frand() < 1 / $connectGenesNb) {
-                        $connectGene->setWeight($connectGene->weight() * Random::nrand(1, 0.5));
+                        $connectGene->setWeight(max(-100, min(100, $connectGene->weight() * Random::nrand(1, 1 / 3))));
                     }
                 }
-                $pool->addAgent($agentFactory->createAgent($nodeGenes, $connectGenes));
+                $agent = $agentFactory->createAgent($nodeGenes, $connectGenes);
+                $agent->setSpecies($speciesId);
+                $pool->addAgent($agent);
+                ++$popSizeDelta;
+            }
+        }
+
+        echo 'POOL', PHP_EOL;
+        foreach ($pool as $id => $agent) {
+            echo $id, ' ', $agent->species(), ' ', $agent->fitness(), PHP_EOL;
+        }
+
+        // $agentFactory = $pool->agentFactory();
+        // $offsprings = [];
+        //
+        // $nbOffspringsToProduce = $pool->populationSize() - count($pool);
+        // while ($nbOffspringsToProduce--) {
+        //     $parent1 = $pool->agentNb($this->choseParent($pool));
+        //     $parent2 = $pool->agentNb($this->choseParent($pool));
+        //
+        //     list($nodeGenes, $connectGenes) = $parent1->fitness() > $parent2->fitness() ?
+        //         $this->getOffspringGenes($parent1, $parent2) :
+        //         $this->getOffspringGenes($parent2, $parent1);
+        //
+        // }
+        //
+        // foreach ($offsprings as $offspring) {
+        //     $pool->addAgent($offspring);
+        // }
+    }
+
+    protected function choseParent(array $species): int
+    {
+        $nbAgents = count($species);
+        $selectedAgent = rand(1, $nbAgents);
+        foreach ($species as $agentNb => $fitnes) {
+            if (!--$selectedAgent) {
+                return $agentNb;
+            }
+        }
+    }
+
+    protected function removeAgents(PoolInterface $pool): void
+    {
+        $popSize = $pool->populationSize();
+
+        $i = 0;
+        foreach ($pool as $agentId => $agent) {
+            if (Random::frand() <= ($i++ / $popSize) ** 0.5) {
+                echo 'Removing agent ', $agentId, PHP_EOL;
+                $pool->removeAgent($agentId);
+            }
+        }
+    }
+
+    protected function getSpecies(PoolInterface $pool): array
+    {
+        $species = [];
+
+        foreach ($pool as $agentId => $agent) {
+            $species[$agent->species()][$agentId] = $agent->fitness();
+        }
+
+        return $species;
+    }
+
+    protected function getNbOffsprings(array $species, int $targetPopSize): array
+    {
+        $popSizes = [];
+        foreach ($species as $i => $s) {
+            $popSizes[$i] = count($s);
+            $species[$i] = array_sum($s) / $popSizes[$i];
+        }
+        $avgFitness = array_sum($species) / count($species);
+
+        foreach ($species as $i => $s) {
+            $species[$i] = round($s / $avgFitness * $popSizes[$i]);
+        }
+
+        while (array_sum($species) > $targetPopSize) {
+            --$species[$this->choseSpecies($species)];
+        }
+
+        while (array_sum($species) < $targetPopSize) {
+            ++$species[$this->choseSpecies($species)];
+        }
+
+        return $species;
+    }
+
+    protected function choseSpecies(array $species): int
+    {
+        $nbAgents = (int)array_sum($species) - count($species);
+
+        $chosenSpecies = rand(0, $nbAgents);
+        foreach ($species as $speciesId => $popSize) {
+            $chosenSpecies -= $popSize - 1;
+            if ($chosenSpecies <= 0) {
+                return $speciesId;
             }
         }
     }

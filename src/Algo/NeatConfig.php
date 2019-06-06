@@ -15,7 +15,6 @@ class NeatConfig implements NeatConfigInterface
     protected $pool;
     protected $threshold;
     protected $fitnessFunction;
-    protected $selectionFunction;
     protected $matingFunction;
     protected $speciationFunction;
 
@@ -23,7 +22,6 @@ class NeatConfig implements NeatConfigInterface
         PoolInterface $pool,
         ThresholdInterface $threshold,
         callable $fitnessFunction,
-        SelectionInterface $selectionFunction,
         MatingInterface $matingFunction,
         SpeciationInterface $speciationFunction
     )
@@ -31,7 +29,6 @@ class NeatConfig implements NeatConfigInterface
         $this->pool = $pool;
         $this->threshold = $threshold;
         $this->fitnessFunction = $fitnessFunction;
-        $this->selectionFunction = $selectionFunction;
         $this->matingFunction = $matingFunction;
         $this->speciationFunction = $speciationFunction;
     }
@@ -54,11 +51,6 @@ class NeatConfig implements NeatConfigInterface
     public function speciationFunction(): callable
     {
         return $this->speciationFunction;
-    }
-
-    public function selectionFunction(): callable
-    {
-        return $this->selectionFunction;
     }
 
     public function matingFunction(): callable

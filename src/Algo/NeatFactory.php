@@ -18,7 +18,6 @@ use IngeniozIT\Math\ActivationFunction;
 class NeatFactory implements NeatFactoryInterface
 {
     protected $initializationMethod;
-    protected $selectionFunction;
     protected $matingFunction;
     protected $speciationFunction;
     protected $activationFunctions = [[ActivationFunction::class, 'sigmoid']];
@@ -32,7 +31,6 @@ class NeatFactory implements NeatFactoryInterface
     public function __construct()
     {
         $this->initializationMethod = new FullyConnectedInitialization();
-        $this->selectionFunction = new OriginalSelection();
         $this->matingFunction = new OriginalMating();
         $this->speciationFunction = new KmeansSpeciation();
         $this->genotypeFactory = new GenotypeFactory();
@@ -47,7 +45,7 @@ class NeatFactory implements NeatFactoryInterface
     public function createNeat(int $nbInputs, int $nbOutputs, $populationSize, ThresholdInterface $threshold, callable $fitnessFunction): Neat
     {
         $pool = $this->createPool($nbInputs, $nbOutputs, $populationSize);
-        $neat = new Neat($pool, $threshold, $fitnessFunction, $this->selectionFunction, $this->matingFunction, $this->speciationFunction);
+        $neat = new Neat($pool, $threshold, $fitnessFunction, $this->matingFunction, $this->speciationFunction);
 
         return $neat;
     }

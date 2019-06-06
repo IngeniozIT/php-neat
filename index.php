@@ -2,7 +2,7 @@
 require_once 'vendor/autoload.php';
 
 use IngeniozIT\Neat\Algo\NeatFactory;
-use IngeniozIT\Neat\Threshold\MinThreshold;
+use IngeniozIT\Neat\Threshold\MaxThreshold;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 
 function xorFitness(PoolInterface $pool)
@@ -16,9 +16,9 @@ function xorFitness(PoolInterface $pool)
         [[1, 1], 0],
     ];
     foreach ($pool as $i => $agent) {
-        $fitness = 4;
+        $fitness = 0;
         foreach ($xor as $x) {
-            $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
+            $fitness += abs($agent->activate($x[0])[0] - $x[1]);
         }
         $agent->setFitness($fitness);
         $fitnesses[$i] = $fitness;
@@ -29,7 +29,7 @@ function xorFitness(PoolInterface $pool)
     echo 'Avg fitness : '.(array_sum($fitnesses) / count($fitnesses)), PHP_EOL;
 }
 
-$neat = (new NeatFactory())->createNeat(3, 1, 20, new MinThreshold(0.05), 'xorFitness');
+$neat = (new NeatFactory())->createNeat(3, 1, 50, new MaxThreshold(3.95), 'xorFitness');
 
 var_dump($neat->run());
 /*
