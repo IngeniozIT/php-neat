@@ -52,6 +52,11 @@ class Genome implements GenomeInterface
         return $this->nodeGenes;
     }
 
+    public function nodeGenesNb(): int
+    {
+        return count($this->nodeGenes);
+    }
+
     /**
      * Get the maximum node gene innovation number.
      *
@@ -70,6 +75,11 @@ class Genome implements GenomeInterface
     public function connectGenes(): array
     {
         return $this->connectGenes;
+    }
+
+    public function connectGenesNb(): int
+    {
+        return count($this->connectGenes);
     }
 
     /**

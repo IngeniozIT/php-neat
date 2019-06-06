@@ -16,7 +16,7 @@ class OriginalMating implements MatingInterface
         $agentFactory = $pool->agentFactory();
 
         $this->removeAgents($pool);
-        $species = $this->getSpecies($pool);
+        $species = $pool->getSpecies();
         $offspringsNb = $this->getNbOffsprings($species, $pool->populationSize());
 
         foreach ($offspringsNb as $speciesId => $targetPopSize) {
@@ -87,17 +87,6 @@ class OriginalMating implements MatingInterface
                 $pool->removeAgent($agentId);
             }
         }
-    }
-
-    protected function getSpecies(PoolInterface $pool): array
-    {
-        $species = [];
-
-        foreach ($pool as $agentId => $agent) {
-            $species[$agent->species()][$agentId] = $agent->fitness();
-        }
-
-        return $species;
     }
 
     protected function getNbOffsprings(array $species, int $targetPopSize): array

@@ -5,6 +5,7 @@ namespace IngeniozIT\Neat\Algo;
 
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Exceptions\InvalidArgumentException;
+use IngeniozIT\Neat\Exceptions\RuntimeException;
 use IngeniozIT\Neat\Genotype\Interfaces\GenotypeFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentFactoryInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
@@ -115,6 +116,16 @@ class Pool implements PoolInterface
         return $this->outputGenes;
     }
 
+    public function activationFunctions(): array
+    {
+        return $this->activationFunctions;
+    }
+
+    public function aggregationFunctions(): array
+    {
+        return $this->aggregationFunctions;
+    }
+
     public function genotypeFactory(): GenotypeFactoryInterface
     {
         return $this->genotypeFactory;
@@ -203,5 +214,16 @@ class Pool implements PoolInterface
         foreach ($this->agents as $agent) {
             return $agent;
         }
+    }
+
+    public function getSpecies(): array
+    {
+        $species = [];
+
+        foreach ($this->agents as $agentId => $agent) {
+            $species[$agent->species()][] = $agentId;
+        }
+
+        return $species;
     }
 }

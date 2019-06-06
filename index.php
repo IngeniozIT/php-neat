@@ -4,6 +4,7 @@ require_once 'vendor/autoload.php';
 use IngeniozIT\Neat\Algo\NeatFactory;
 use IngeniozIT\Neat\Threshold\MaxThreshold;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
+use IngeniozIT\Neat\Implementation\Speciation\OriginalSpeciation;
 
 function xorFitness(PoolInterface $pool)
 {
@@ -29,7 +30,9 @@ function xorFitness(PoolInterface $pool)
     echo 'Avg fitness : '.(array_sum($fitnesses) / count($fitnesses)), PHP_EOL;
 }
 
-$neat = (new NeatFactory())->createNeat(3, 1, 50, new MaxThreshold(3.95), 'xorFitness');
+$factory = new NeatFactory();
+$factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
+$neat = $factory->createNeat(3, 1, 50, new MaxThreshold(3.95), 'xorFitness');
 
 var_dump($neat->run());
 /*

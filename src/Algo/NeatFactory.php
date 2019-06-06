@@ -5,9 +5,9 @@ namespace IngeniozIT\Neat\Algo;
 
 use IngeniozIT\Neat\Algo\Interfaces\NeatFactoryInterface;
 use IngeniozIT\Neat\Implementation\Initialization\FullyConnectedInitialization;
-use IngeniozIT\Neat\Implementation\Selection\OriginalSelection;
 use IngeniozIT\Neat\Implementation\Mating\OriginalMating;
 use IngeniozIT\Neat\Implementation\Speciation\KmeansSpeciation;
+use IngeniozIT\Neat\Implementation\Interfaces\SpeciationInterface;
 use IngeniozIT\Neat\Threshold\Interfaces\ThresholdInterface;
 use IngeniozIT\Neat\Genotype\GenotypeFactory;
 use IngeniozIT\Neat\Agents\AgentFactory;
@@ -35,6 +35,11 @@ class NeatFactory implements NeatFactoryInterface
         $this->speciationFunction = new KmeansSpeciation();
         $this->genotypeFactory = new GenotypeFactory();
         $this->agentFactory = new AgentFactory();
+    }
+
+    public function setSpeciationFunction(SpeciationInterface $speciationFunction): void
+    {
+        $this->speciationFunction = $speciationFunction;
     }
 
     public function createPool(int $nbInputs, int $nbOutputs, $populationSize): PoolInterface
