@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace IngeniozIT\Neat\Implementation\Utils;
 
-trait ChoseArrayIndexTrait
+trait ChoseArrayTrait
 {
     /**
      * Chose a random index from the given array.
@@ -19,6 +19,24 @@ trait ChoseArrayIndexTrait
         foreach ($array as $index => $value) {
             if (--$chosen <= 0) {
                 return $index;
+            }
+        }
+    }
+
+    /**
+     * Chose a random value from the given array.
+     *
+     * @param  array $array
+     *
+     * @return mixed The chosen value.
+     */
+    protected function choseArrayValue(array $array)
+    {
+        $count = count($array);
+        $chosen = rand(1, $count);
+        foreach ($array as $index => $value) {
+            if (--$chosen <= 0) {
+                return $value;
             }
         }
     }

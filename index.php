@@ -33,6 +33,7 @@ function xorFitness(PoolInterface $pool)
 $factory = new NeatFactory();
 $factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
 $neat = $factory->createNeat(3, 1, 50, new MaxThreshold(3.95), 'xorFitness');
+$neat->setMaxGenerations(500);
 
 var_dump($neat->run());
 /*

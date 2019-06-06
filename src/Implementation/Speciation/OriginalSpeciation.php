@@ -5,7 +5,7 @@ namespace IngeniozIT\Neat\Implementation\Speciation;
 
 use IngeniozIT\Neat\Implementation\Interfaces\SpeciationInterface;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
-use IngeniozIT\Neat\Implementation\Utils\ChoseArrayIndexTrait;
+use IngeniozIT\Neat\Implementation\Utils\ChoseArrayTrait;
 use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 
 /**
@@ -18,7 +18,7 @@ use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
  */
 class OriginalSpeciation implements SpeciationInterface
 {
-    use ChoseArrayIndexTrait;
+    use ChoseArrayTrait;
 
     protected $deltaThreshold;
     protected $c1;

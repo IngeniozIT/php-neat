@@ -12,6 +12,11 @@ class Neat extends NeatConfig implements NeatInterface
     protected $currentGeneration = 0;
     protected $maxGenerations = null;
 
+    public function setMaxGenerations(?int $maxGenerations): void
+    {
+        $this->maxGenerations = $maxGenerations;
+    }
+
     public function run(): bool
     {
         $generation = 0;

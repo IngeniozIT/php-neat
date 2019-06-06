@@ -8,9 +8,12 @@ use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Agents\Interfaces\GenomeInterface;
 use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 use IngeniozIT\Math\Random;
+use IngeniozIT\Neat\Implementation\Utils\ChoseArrayTrait;
 
 class OriginalMating implements MatingInterface
 {
+    use ChoseArrayTrait;
+
     public function __invoke(PoolInterface $pool): void
     {
         $agentFactory = $pool->agentFactory();
@@ -22,8 +25,8 @@ class OriginalMating implements MatingInterface
         foreach ($offspringsNb as $speciesId => $targetPopSize) {
             $popSizeDelta = count($species[$speciesId]) - $targetPopSize;
             while ($popSizeDelta < 0) {
-                $parent1 = $pool->agentNb($this->choseParent($species[$speciesId]));
-                $parent2 = $pool->agentNb($this->choseParent($species[$speciesId]));
+                $parent1 = $pool->agentNb($this->choseArrayValue($species[$speciesId]));
+                $parent2 = $pool->agentNb($this->choseArrayValue($species[$speciesId]));
 
                 list($nodeGenes, $connectGenes) = $parent1->fitness() > $parent2->fitness() ?
                     $this->getOffspringGenes($parent1, $parent2) :
@@ -41,10 +44,10 @@ class OriginalMating implements MatingInterface
             }
         }
 
-        echo 'POOL', PHP_EOL;
-        foreach ($pool as $id => $agent) {
-            echo $id, ' ', $agent->species(), ' ', $agent->fitness(), PHP_EOL;
-        }
+        // echo 'POOL', PHP_EOL;
+        // foreach ($pool as $id => $agent) {
+        //     echo $id, ' ', $agent->species(), ' ', $agent->fitness(), PHP_EOL;
+        // }
 
         // $agentFactory = $pool->agentFactory();
         // $offsprings = [];
