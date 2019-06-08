@@ -49,8 +49,8 @@ $factory->setDefaultActivationFunction(['customSigmoid']);
 // $factory->setDefaultActivationFunction([[ActivationFunction::class, 'binaryStep']]);
 // $factory->setActivationFunctions(['customSigmoid', [ActivationFunction::class, 'binaryStep']]);
 $factory->setDefaultActivationFunction(['customSigmoid']);
-$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(1), 'xorFitness');
-$neat->setMaxGenerations(200);
+$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(0.99), 'xorFitness');
+$neat->setMaxGenerations(50);
 
 var_dump($neat->run());
 echo $neat->pool()->champion();

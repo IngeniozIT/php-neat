@@ -6,6 +6,7 @@ namespace IngeniozIT\Neat\Implementation\Speciation;
 use IngeniozIT\Neat\Implementation\Interfaces\SpeciationInterface;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Implementation\Utils\ChoseArrayTrait;
+use IngeniozIT\Neat\Implementation\Utils\AgentsComparator;
 use IngeniozIT\Neat\Agents\Interfaces\AgentInterface;
 
 /**
@@ -58,8 +59,8 @@ class OriginalSpeciation implements SpeciationInterface
     {
         // Gets species representants
         $currentSpecies = $pool->getSpecies();
-        $ignoreActivationFunctions = count($pool->activationFunctions()) === 1;
-        $ignoreAggregationFunctions = count($pool->aggregationFunctions()) === 1;
+        $ignoreActFns = count($pool->activationFunctions()) === 1;
+        $ignoreAggrFns = count($pool->aggregationFunctions()) === 1;
 
         $species = [];
         foreach ($currentSpecies as $speciesId => $agentIds) {
@@ -74,8 +75,9 @@ class OriginalSpeciation implements SpeciationInterface
         foreach ($pool as $agentId => $agent) {
             $assigned = false;
             foreach ($species as $speciesId => $agentIds) {
+                $agentsComparator = new AgentsComparator($pool->agentNb($agentIds[0]), $pool->agentNb($agentId));
                 // Assign to first matching species
-                if ($this->getDistance($pool->agentNb($agentIds[0]), $pool->agentNb($agentId)) <= $this->deltaThreshold) {
+                if ($this->getDistance($agentsComparator, $ignoreActFns, $ignoreAggrFns) <= $this->deltaThreshold) {
                     $assigned = true;
                     $species[$speciesId][] = $agentId;
                 }
@@ -97,169 +99,26 @@ class OriginalSpeciation implements SpeciationInterface
      *
      * @param  AgentInterface $a1
      * @param  AgentInterface $a2
-     * @param  boolean $ignoreActivationFunctions True to ignore activation functions.
+     * @param  boolean $ignoreActFns True to ignore activation functions.
      * @param  boolean $ignoreAggregationFunctions True to ignore aggregation functions.
      *
      * @return float
      *
      * @see http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf - section 3.3
      */
-    public function getDistance(AgentInterface $a1, AgentInterface $a2, bool $ignoreActivationFunctions = false, bool $ignoreAggregationFunctions = false): float
+    public function getDistance(AgentsComparator $agentsComparator, bool $ignoreActFns = false, bool $ignoreAggrFns = false): float
     {
-        $maxConnectGenesNb = max($a1->connectGenesNb(), $a2->connectGenesNb());
-        $maxNodeGenesNb = max($a1->nodeGenesNb(), $a2->nodeGenesNb());
+        $maxConnectGenesNb = $agentsComparator->maxConnectNb();
+        $maxNodeGenesNb = $agentsComparator->maxNodeNb();
 
         return (
-            $this->c1 * $this->excessGenesNb($a1, $a2) +
-            $this->c2 * $this->disjointGenesNb($a1, $a2)
+            $this->c1 * $agentsComparator->excessGenesNb() +
+            $this->c2 * $agentsComparator->disjointGenesNb()
         ) / $maxConnectGenesNb +
-        $this->c3 * $this->avgWeightDifference($a1, $a2) +
+        $this->c3 * $agentsComparator->avgWeightDifference() +
         (
-            ($ignoreActivationFunctions ? 0 : $this->c4 * $this->activationFnDifference($a1, $a2)) +
-            ($ignoreAggregationFunctions ? 0 : $this->c5 * $this->aggregationFnDifference($a1, $a2))
+            ($ignoreActFns ? 0 : $this->c4 * $agentsComparator->activationFnDifference()) +
+            ($ignoreAggrFns ? 0 : $this->c5 * $agentsComparator->aggregationFnDifference())
         ) / $maxConnectGenesNb;
-    }
-
-    /**
-     * Count how many excess genes exist between two agents.
-     *
-     * @param  AgentInterface $a1
-     * @param  AgentInterface $a2
-     *
-     * @return int
-     */
-    public function excessGenesNb(AgentInterface $a1, AgentInterface $a2): int
-    {
-        $a1InnovNb = $a1->maxConnectInnovation();
-        $a2InnovNb = $a2->maxConnectInnovation();
-
-        $maxInnov = max($a1InnovNb, $a2InnovNb);
-        $minInnov = min($a1InnovNb, $a2InnovNb);
-
-        $a1Genes = $a1->connectGenes();
-        $a2Genes = $a2->connectGenes();
-
-        $count = 0;
-        $countA1 = false;
-        for ($i = $minInnov; $i <= $maxInnov; ++$i) {
-            if (isset($a1Genes[$i]) && isset($a2Genes[$i])) {
-                $count = 0;
-            } elseif (!isset($a2Genes[$i])) {
-                if (false === $countA1) {
-                    $count = 1;
-                    $countA1 = true;
-                } else {
-                    ++$count;
-                }
-            } else {
-                if (true === $countA1) {
-                    $count = 1;
-                    $countA1 = false;
-                } else {
-                    ++$count;
-                }
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Count how many disjoint genes exist between two agents.
-     *
-     * @param  AgentInterface $a1
-     * @param  AgentInterface $a2
-     *
-     * @return int
-     */
-    public function disjointGenesNb(AgentInterface $a1, AgentInterface $a2): int
-    {
-        $maxInnov = max($a1->maxConnectInnovation(), $a2->maxConnectInnovation());
-
-        $a1Genes = $a1->connectGenes();
-        $a2Genes = $a2->connectGenes();
-
-        $count = 0;
-        for ($i = 1; $i <= $maxInnov; ++$i) {
-            if (!isset($a1Genes[$i]) || !isset($a2Genes[$i])) {
-                ++$count;
-            }
-        }
-
-        return $count - $this->excessGenesNb($a1, $a2);
-    }
-
-    /**
-     * Compute the average weight difference of two agents' matching genes.
-     *
-     * @param  AgentInterface $a1
-     * @param  AgentInterface $a2
-     *
-     * @return float
-     */
-    public function avgWeightDifference(AgentInterface $a1, AgentInterface $a2): float
-    {
-        $maxInnov = max($a1->maxConnectInnovation(), $a2->maxConnectInnovation());
-        $a1Genes = $a1->connectGenes();
-        $a2Genes = $a2->connectGenes();
-
-        $weightDiff = 0;
-        $count = 0;
-        for ($i = 1; $i <= $maxInnov; ++$i) {
-            if (isset($a1Genes[$i]) && isset($a2Genes[$i])) {
-                $weightDiff += abs($a1Genes[$i]->weight() - $a2Genes[$i]->weight());
-                ++$count;
-            }
-        }
-
-        return $count !== 0 ? ($weightDiff / $count) : 0.0;
-    }
-
-    /**
-     * Count how many node matching genes of two agents have different activation functions.
-     *
-     * @param  AgentInterface $a1
-     * @param  AgentInterface $a2
-     *
-     * @return int
-     */
-    public function activationFnDifference(AgentInterface $a1, AgentInterface $a2): int
-    {
-        $maxInnov = max($a1->maxNodeInnovation(), $a2->maxNodeInnovation());
-        $a1Genes = $a1->nodeGenes();
-        $a2Genes = $a2->nodeGenes();
-
-        $count = 0;
-        for ($i = 1; $i <= $maxInnov; ++$i) {
-            if (isset($a1Genes[$i]) && isset($a2Genes[$i]) && $a1Genes[$i]->activationFunction() !== $a2Genes[$i]->activationFunction()) {
-                ++$count;
-            }
-        }
-
-        return $count;
-    }
-
-    /**
-     * Count how many node matching genes of two agents have different aggregation functions.
-     *
-     * @param  AgentInterface $a1
-     * @param  AgentInterface $a2
-     *
-     * @return int
-     */
-    public function aggregationFnDifference(AgentInterface $a1, AgentInterface $a2): int
-    {
-        $maxInnov = max($a1->maxNodeInnovation(), $a2->maxNodeInnovation());
-        $a1Genes = $a1->nodeGenes();
-        $a2Genes = $a2->nodeGenes();
-
-        $count = 0;
-        for ($i = 1; $i <= $maxInnov; ++$i) {
-            if (isset($a1Genes[$i]) && isset($a2Genes[$i]) && $a1Genes[$i]->aggregationFunction() !== $a2Genes[$i]->aggregationFunction()) {
-                ++$count;
-            }
-        }
-
-        return $count;
     }
 }
