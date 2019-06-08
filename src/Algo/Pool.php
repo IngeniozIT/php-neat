@@ -131,7 +131,7 @@ class Pool implements PoolInterface
         return $this->genotypeFactory;
     }
 
-    public function agentFactory(): AgentFactoryInterface
+    public function &agentFactory(): AgentFactoryInterface
     {
         return $this->agentFactory;
     }
@@ -181,7 +181,7 @@ class Pool implements PoolInterface
         $this->agents[] = $agent;
     }
 
-    public function agentNb(int $agentId): AgentInterface
+    public function &agentNb(int $agentId): AgentInterface
     {
         if (!isset($this->agents[$agentId])) {
             throw new RuntimeException("Agent $agentId does not exist.");
@@ -225,5 +225,10 @@ class Pool implements PoolInterface
         }
 
         return $species;
+    }
+
+    public function agents(): array
+    {
+        return $this->agents;
     }
 }

@@ -14,8 +14,7 @@ trait ChoseArrayTrait
      */
     protected function choseArrayIndex(iterable $array): int
     {
-        $count = count($array);
-        $chosen = rand(1, $count);
+        $chosen = rand(1, count($array));
         foreach ($array as $index => $value) {
             if (--$chosen <= 0) {
                 return $index;
@@ -32,8 +31,7 @@ trait ChoseArrayTrait
      */
     protected function choseArrayValue(iterable $array)
     {
-        $count = count($array);
-        $chosen = rand(1, $count);
+        $chosen = rand(1, count($array));
         foreach ($array as $index => $value) {
             if (--$chosen <= 0) {
                 return $value;

@@ -37,7 +37,7 @@ class FullyConnectedInitialization extends NotConnectedInitialization implements
             }
         }
 
-        foreach ($pool as $agent) {
+        foreach ($pool->agents() as $agent) {
             foreach ($connectGenotypes as $connectGenotype) {
                 $agent->addConnectGene(
                     $genotypeFactory->createConnectGeneFromConnectGenotype(

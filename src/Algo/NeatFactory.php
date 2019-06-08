@@ -8,6 +8,7 @@ use IngeniozIT\Neat\Implementation\Initialization\FullyConnectedInitialization;
 use IngeniozIT\Neat\Implementation\Mating\OriginalMating;
 use IngeniozIT\Neat\Implementation\Speciation\KmeansSpeciation;
 use IngeniozIT\Neat\Implementation\Interfaces\SpeciationInterface;
+use IngeniozIT\Neat\Implementation\Interfaces\MatingInterface;
 use IngeniozIT\Neat\Threshold\Interfaces\ThresholdInterface;
 use IngeniozIT\Neat\Genotype\GenotypeFactory;
 use IngeniozIT\Neat\Agents\AgentFactory;
@@ -40,6 +41,11 @@ class NeatFactory implements NeatFactoryInterface
     public function setSpeciationFunction(SpeciationInterface $speciationFunction): void
     {
         $this->speciationFunction = $speciationFunction;
+    }
+
+    public function setMatingFunction(MatingInterface $matingFunction): void
+    {
+        $this->matingFunction = $matingFunction;
     }
 
     public function setActivationFunctions(array $activationFunctions): void

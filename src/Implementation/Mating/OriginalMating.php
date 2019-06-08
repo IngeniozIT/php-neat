@@ -36,8 +36,8 @@ class OriginalMating implements MatingInterface
         float $weightMutationRate = 0.8,
         float $uniformWeightMutationRate = 0.9,
         float $newNodeMutationRate = 0.03,
-        float $newLinkMutationRate = 1 / 150 ** 0.5,
-        float $interSpeciesBreedingRate = 0.2
+        float $newLinkMutationRate = 0.05,
+        float $interSpeciesBreedingRate = 0.001
     )
     {
         $this->elitesPct = $elitesPct;
@@ -58,96 +58,110 @@ class OriginalMating implements MatingInterface
 
     protected function mateAgents(PoolInterface $pool, array $popTarget): void
     {
-        $species = $pool->getSpecies();
-        $genotypeFactory = $pool->genotypeFactory();
         $agentFactory = $pool->agentFactory();
-        $activationFunctions = $pool->activationFunctions();
-        $aggregationFunctions = $pool->aggregationFunctions();
-
-        foreach ($species as $speciesId => $agents) {
-            $speciesCount = count($agents);
-            for ($i = $popTarget[$speciesId] - $speciesCount; $i > 0; --$i) {
-                // Chose parents
-                $parent1Id = $agents[rand(0, $speciesCount - 1)];
-                if (Random::frand() <= $this->interSpeciesBreedingRate && count($species) > 1) {
-                    // Chose parent 2 from other species
-                    do {
-                        $parent2Id = $this->choseArrayIndex($pool);
-                    } while (\in_array($parent2Id, $agents));
-                } else {
-                    $parent2Id = $agents[rand(0, $speciesCount - 1)];
+        $offsprings = [];
+        $species = $pool->getSpecies();
+        $allowInterspecies = count($species) > 1;
+        foreach ($species as $speciesId => $agentIds) {
+            $delta = $popTarget[$speciesId] - count($agentIds);
+            if ($delta < 0) {
+                while ($delta < 0) {
+                    $pool->removeAgent(array_pop($agentIds));
+                    ++$delta;
                 }
-                // Reproduce parents
-                $parent1 = $pool->agentNb($parent1Id);
-                $parent2 = $pool->agentNb($parent2Id);
-                list($offspringNodeGenes, $offspringConnectGenes) = ($parent1->fitness() > $parent2->fitness()) ?
-                    $this->getOffspringGenes($parent1, $parent2) :
-                    $this->getOffspringGenes($parent2, $parent1);
-                // Weight mutation
-                if (Random::frand() <= $this->weightMutationRate) {
-                    foreach ($offspringConnectGenes as $connectGene) {
-                        if (Random::frand() <= $this->uniformWeightMutationRate) {
-                            $newWeight = $connectGene->weight() + Random::nrand(0, 0.1);
-                        } else {
-                            $newWeight = Random::frand(-10, 10);
-                        }
-                        $connectGene->setWeight(max(-10, min(10, $newWeight)));
-                    }
+            } elseif ($delta > 0) {
+                while ($delta > 0) {
+                    // Chose parents
+                    list($p1, $p2) = $this->choseParents($pool, $agentIds, $allowInterspecies);
+                    // Reproduce parents
+                    list($offspringNodeGenes, $offspringConnectGenes) = ($p1->fitness() > $p2->fitness()) ?
+                        $this->getOffspringGenes($p1, $p2) :
+                        $this->getOffspringGenes($p2, $p1);
+                    // Mutate offspring
+                    $this->mutateOffspring($pool, $offspringNodeGenes, $offspringConnectGenes);
+                    // Add offspring to pool
+                    $offsprings[] = $agentFactory->createAgent($offspringNodeGenes, $offspringConnectGenes);
+                    --$delta;
                 }
-                // Add node mutation
-                if (Random::frand() <= $this->newNodeMutationRate) {
-                    $mutatingConnection = $this->choseArrayValue($offspringConnectGenes);
-                    list($newNode, $newConnections) = $genotypeFactory->splitConnectGene(
-                        $mutatingConnection,
-                        $this->choseArrayValue($activationFunctions),
-                        $this->choseArrayValue($aggregationFunctions)
-                    );
-                    if (!isset($offspringNodeGenes[$newNode->innovNb()])) {
-                        // Disable connection
-                        $mutatingConnection->setDisabled(true);
-                        // Add node
-                        $offspringNodeGenes[$newNode->innovNb()] = $newNode;
-                        // Add in connection
-                        $offspringConnectGenes[$newConnections[0]->innovNb()] = $newConnections[0];
-                        // Add out connection
-                        $offspringConnectGenes[$newConnections[1]->innovNb()] = $newConnections[1];
-                    }
-                }
-                // New link mutation
-                foreach ($offspringNodeGenes as $inNode) {
-                    if ($inNode->isOutput()) {
-                        continue;
-                    }
-                    if (Random::frand() <= $this->newLinkMutationRate) {
-                        $inInnovNb = $inNode->innovNb();
-                        // do {
-                        //     $inNode = $this->choseArrayValue($offspringNodeGenes);
-                        // } while ($inNode->isOutput());
-                        do {
-                            $outNode = $this->choseArrayValue($offspringNodeGenes);
-                        } while ($outNode->isSensor() || $inInnovNb === $outNode->innovNb());
-                        $newConnection = $genotypeFactory->createConnectGene(
-                            $inInnovNb,
-                            $outNode->innovNb(),
-                            Random::frand(-10, 10)
-                        );
-                        if (null === $newConnection) {
-                            continue;
-                        }
-                        $innovNb = $newConnection->innovNb();
-                        if (!isset($offspringConnectGenes[$innovNb])) {
-                            $offspringConnectGenes[$innovNb] = $newConnection;
-                        } elseif ($offspringConnectGenes[$innovNb]->isDisabled()) {
-                            $offspringConnectGenes[$innovNb]->setDisabled(false);
-                        }
-                    }
-                }
-                // Add offspring to pool
-                $offspring = $agentFactory->createAgent($offspringNodeGenes, $offspringConnectGenes);
-                $offspring->setSpecies($parent1->species());
-                $pool->addAgent($offspring);
             }
         }
+        foreach ($offsprings as $offspring) {
+            $pool->addAgent($offspring);
+        }
+    }
+
+    protected function mutateOffspring(PoolInterface $pool, array &$nodeGenes, array &$connectGenes): void
+    {
+        $genotypeFactory = $pool->genotypeFactory();
+        // Mutate weights
+        if (Random::frand() <= $this->weightMutationRate) {
+            foreach ($connectGenes as $connectGene) {
+                if (Random::frand() <= $this->uniformWeightMutationRate) {
+                    $newWeight = $connectGene->weight() + Random::nrand(0, 1);
+                } else {
+                    $newWeight = Random::frand(-10, 10);
+                }
+                $connectGene->setWeight(min(10, max(-10, $newWeight)));
+            }
+        }
+        // Add node mutation
+        if (Random::frand() <= $this->newNodeMutationRate) {
+            $mutatingConnection = $this->choseArrayValue($connectGenes);
+            list($newNode, $newConnections) = $genotypeFactory->splitConnectGene(
+                $mutatingConnection,
+                $this->choseArrayValue($pool->activationFunctions()),
+                $this->choseArrayValue($pool->aggregationFunctions())
+            );
+            if (!isset($nodeGenes[$newNode->innovNb()])) {
+                // Disable connection
+                $mutatingConnection->setDisabled(true);
+                // Add node
+                $nodeGenes[$newNode->innovNb()] = $newNode;
+                // Add in connection
+                $connectGenes[$newConnections[0]->innovNb()] = $newConnections[0];
+                // Add out connection
+                $connectGenes[$newConnections[1]->innovNb()] = $newConnections[1];
+            }
+        }
+        // New link mutation
+        if (Random::frand() <= $this->newLinkMutationRate) {
+            do {
+                $inNode = $this->choseArrayValue($nodeGenes);
+            } while ($inNode->isOutput());
+            $inInnovNb = $inNode->innovNb();
+            do {
+                $outNode = $this->choseArrayValue($nodeGenes);
+            } while ($outNode->isSensor() || $inInnovNb === $outNode->innovNb());
+            $newConnection = $genotypeFactory->createConnectGene(
+                $inInnovNb,
+                $outNode->innovNb(),
+                Random::frand(-10, 10)
+            );
+            if (null !== $newConnection) {
+                $innovNb = $newConnection->innovNb();
+                if (!isset($connectGenes[$innovNb])) {
+                    $connectGenes[$innovNb] = $newConnection;
+                } elseif ($connectGenes[$innovNb]->isDisabled()) {
+                    $connectGenes[$innovNb]->setDisabled(false);
+                }
+            }
+        }
+    }
+
+    protected function choseParents(PoolInterface $pool, array $agentIds, bool $allowInterspecies = true): array
+    {
+        $p1 = $pool->agentNb($this->choseArrayValue($agentIds));
+
+        if ($allowInterspecies && Random::frand() <= $this->interSpeciesBreedingRate) {
+            // Chose parent 2 from other species
+            do {
+                $p2 = $this->choseArrayValue($pool->agents());
+            } while ($p2->species() === $p1->species());
+        } else {
+            $p2 = $pool->agentNb($this->choseArrayValue($agentIds));
+        }
+
+        return [$p1, $p2];
     }
 
     /**
@@ -161,31 +175,38 @@ class OriginalMating implements MatingInterface
      */
     protected function getNbOffsprings(PoolInterface $pool): array
     {
-        $nbOffsprings = [];
-
-        $popSizes = [];
         $fitnesses = [];
-        foreach ($pool as $agentId => $agent) {
-            $species = $agent->species();
-            $fitnesses[$species][$agentId] = $agent->fitness();
-            if (!isset($popSizes[$species])) {
-                $popSizes[$species] = 1;
-            } else {
-                ++$popSizes[$species];
+        $speciesFitnesses = [];
+        foreach ($pool->getSpecies() as $speciesId => $agentIds) {
+            $nbAgents = count($agentIds);
+            foreach ($agentIds as $agentId) {
+                $agent = $pool->agentNb($agentId);
+                $fitness = $agent->fitness() / $nbAgents;
+                $fitnesses[] = $fitness;
+                $speciesFitnesses[$agent->species()][] = $fitness;
             }
         }
-        foreach ($fitnesses as $speciesId => $fits) {
-            $fitnesses[$speciesId] = array_sum($fits) / count($fits);
-        }
-        $globalFitness = array_sum($fitnesses) / count($fitnesses);
 
-        foreach ($fitnesses as $speciesId => $fitness) {
-            $nbOffsprings[$speciesId] = round($fitness / $globalFitness * $popSizes[$speciesId]);
+        foreach ($speciesFitnesses as $speciesId => $fits) {
+            $speciesFitnesses[$speciesId] = array_sum($fits);
         }
 
-        $nbAgents = count($pool);
-        while (array_sum($nbOffsprings) < $nbAgents) {
+        $fitnesses = array_sum($fitnesses) / count($fitnesses);
+
+        $nbOffsprings = [];
+        foreach ($speciesFitnesses as $speciesId => $fitness) {
+            $nbOffsprings[$speciesId] = round($fitness / $fitnesses);
+        }
+
+        $targetPop = $pool->populationSize();
+        while (array_sum($nbOffsprings) < $targetPop) {
             ++$nbOffsprings[$this->choseArrayIndex($nbOffsprings)];
+        }
+        while (array_sum($nbOffsprings) > $targetPop) {
+            do {
+                $i = $this->choseArrayIndex($nbOffsprings);
+            } while ($nbOffsprings[$i] <= 0);
+            --$nbOffsprings[$i];
         }
 
         return $nbOffsprings;
@@ -225,68 +246,43 @@ class OriginalMating implements MatingInterface
      */
     protected function getOffspringGenes(GenomeInterface $parent1, GenomeInterface $parent2): array
     {
-        // Get parents connect genes
-        $parent1ConnectGenes = $parent1->connectGenes();
-        $parent2ConnectGenes = $parent2->connectGenes();
-        $maxConnectInnovId = max(
-            max(array_keys($parent1ConnectGenes)),
-            max(array_keys($parent2ConnectGenes))
-        );
+        $offNodeGenes = [];
+        $offConnectGenes = [];
 
-        // Get parents node genes
-        $maxNodeInnovId = 0;
-        $mandatoryNodeGenes = [];
-        $parent1NodeGenes = $parent1->nodeGenes();
-        $parent2NodeGenes = $parent2->nodeGenes();
+        // Connection genes
+        $p1ConnectGenes = $parent1->connectGenes();
+        $p2ConnectGenes = $parent2->connectGenes();
 
-        foreach ($parent1NodeGenes as $innovNb => $nodeGene) {
-            $maxNodeInnovId = max($maxNodeInnovId, $innovNb);
-            if (!$nodeGene->isHidden()) {
-                $mandatoryNodeGenes[$innovNb] = true;
-            }
-        }
-        foreach ($parent2NodeGenes as $connectGene) {
-            $maxNodeInnovId = max($maxNodeInnovId, $nodeGene->innovNb());
-            if (!$nodeGene->isHidden()) {
-                $mandatoryNodeGenes[$innovNb] = true;
-            }
-        }
-
-        // Select offspring connect genes and their corresponding node genes innovation ids
-        $offspringConnectGenes = [];
-        for ($i = 1; $i <= $maxConnectInnovId; ++$i) {
-            if (!isset($parent1ConnectGenes[$i])) {
-                // Do not inherit gene
+        $maxConnectInnovNb = max($parent1->maxConnectInnovation(), $parent2->maxConnectInnovation());
+        for ($i = 1; $i <= $maxConnectInnovNb; ++$i) {
+            if (!isset($p1ConnectGenes[$i])) {
                 continue;
             }
-            $selectedGene = (isset($parent2ConnectGenes[$i]) && rand() % 2) ?
-                $parent2ConnectGenes[$i] :
-                $parent1ConnectGenes[$i];
-            $offspringConnectGenes[$i] = clone $selectedGene;
-            $mandatoryNodeGenes[$offspringConnectGenes[$i]->inId()] = true;
-            $mandatoryNodeGenes[$offspringConnectGenes[$i]->outId()] = true;
+            $nodeGene = !isset($p2ConnectGenes[$i]) || rand() % 2 ?
+                $p1ConnectGenes[$i] :
+                $p2ConnectGenes[$i];
+            $offConnectGenes[$i] = clone $nodeGene;
+            $offNodeGenes[$offConnectGenes[$i]->inId()] = true;
+            $offNodeGenes[$offConnectGenes[$i]->outId()] = true;
         }
 
-        // Select node genes so each connect gene can be attached to an in and out node
-        $offspringNodeGenes = [];
-        for ($innovNb = 1; $innovNb <= $maxNodeInnovId; ++$innovNb) {
-        // foreach ($mandatoryNodeGenes as $innovNb => $foo) {
-            if (
-                isset($parent1NodeGenes[$innovNb]) &&
-                (
-                    !isset($parent2NodeGenes[$innovNb]) ||
-                    rand() % 2
-                )
-            ) {
-                $selectedGene = $parent1NodeGenes[$innovNb];
-            } elseif (isset($parent2NodeGenes[$innovNb])) {
-                $selectedGene = $parent2NodeGenes[$innovNb];
+        // Node genes
+        $p1NodeGenes = $parent1->nodeGenes();
+        $p2NodeGenes = $parent2->nodeGenes();
+
+        foreach ($p1NodeGenes as $nodeGene) {
+            if ($nodeGene->isSensor() || $nodeGene->isOutput()) {
+                $offNodeGenes[$nodeGene->innovNb()] = true;
+            }
+        }
+        foreach ($offNodeGenes as $i => &$foo) {
+            if (!isset($p2NodeGenes[$i]) || rand() % 2) {
+                $foo = clone $p1NodeGenes[$i];
             } else {
-                continue;
+                $foo = clone $p2NodeGenes[$i];
             }
-            $offspringNodeGenes[$innovNb] = clone $selectedGene;
         }
 
-        return [$offspringNodeGenes, $offspringConnectGenes];
+        return [$offNodeGenes, $offConnectGenes];
     }
 }

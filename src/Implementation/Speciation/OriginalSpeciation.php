@@ -72,7 +72,7 @@ class OriginalSpeciation implements SpeciationInterface
         }
 
         // Loop through each genome
-        foreach ($pool as $agentId => $agent) {
+        foreach ($pool->agents() as $agentId => $agent) {
             $assigned = false;
             foreach ($species as $speciesId => $agentIds) {
                 $agentsComparator = new AgentsComparator($pool->agentNb($agentIds[0]), $pool->agentNb($agentId));

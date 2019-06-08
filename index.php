@@ -5,6 +5,7 @@ use IngeniozIT\Neat\Algo\NeatFactory;
 use IngeniozIT\Neat\Threshold\MaxThreshold;
 use IngeniozIT\Neat\Algo\Interfaces\PoolInterface;
 use IngeniozIT\Neat\Implementation\Speciation\OriginalSpeciation;
+use IngeniozIT\Neat\Implementation\Mating\DefaultMating;
 use IngeniozIT\Math\ActivationFunction;
 
 function xorFitness(PoolInterface $pool)
@@ -12,17 +13,17 @@ function xorFitness(PoolInterface $pool)
     $fitnesses = [];
 
     $xor = [
-        [[0, 0], 0],
-        [[0, 1], 1],
-        [[1, 0], 1],
-        [[1, 1], 0],
+        [[1, 0, 0], 0],
+        [[1, 0, 1], 1],
+        [[1, 1, 0], 1],
+        [[1, 1, 1], 0],
     ];
-    foreach ($pool as $i => $agent) {
+    foreach ($pool->agents() as $i => $agent) {
         $fitness = 4;
         foreach ($xor as $x) {
             $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
         }
-        $fitness /= 4;
+        $fitness = $fitness ** 2;
         $agent->setFitness($fitness);
         $fitnesses[$i] = $fitness;
     }
@@ -30,6 +31,7 @@ function xorFitness(PoolInterface $pool)
     // foreach ($pool->getSpecies() as $speciesId => $agents) {
     //     echo '- ', $speciesId, ' => ', count($agents), PHP_EOL;
     // }
+    echo 'Species : '.count($pool->getSpecies()), PHP_EOL;
     echo 'Min fitness : '.min($fitnesses), PHP_EOL;
     echo 'Max fitness : '.max($fitnesses), PHP_EOL;
     echo 'Avg fitness : '.(array_sum($fitnesses) / count($fitnesses)), PHP_EOL;
@@ -41,16 +43,17 @@ function customSigmoid(float $val): float
     return 1 / (1 + exp(-4.9 * $val));
 }
 
+// mt_srand(42);
 $factory = new NeatFactory();
-$factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
+// $factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
 $factory->setActivationFunctions(['customSigmoid']);
 $factory->setDefaultActivationFunction(['customSigmoid']);
 // $factory->setActivationFunctions([[ActivationFunction::class, 'binaryStep']]);
 // $factory->setDefaultActivationFunction([[ActivationFunction::class, 'binaryStep']]);
 // $factory->setActivationFunctions(['customSigmoid', [ActivationFunction::class, 'binaryStep']]);
 $factory->setDefaultActivationFunction(['customSigmoid']);
-$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(0.99), 'xorFitness');
-$neat->setMaxGenerations(50);
+$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(3.9 ** 2), 'xorFitness');
+$neat->setMaxGenerations(500);
 
 var_dump($neat->run());
 echo $neat->pool()->champion();

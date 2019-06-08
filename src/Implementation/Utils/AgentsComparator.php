@@ -10,8 +10,6 @@ class AgentsComparator
     protected $a1;
     protected $a2;
 
-    protected $minCommonConnectInnovNb = null;
-    protected $minCommonNodeInnovNb = null;
     protected $maxConnectInnovNb = null;
     protected $maxNodeInnovNb = null;
     protected $excessGenesNb = null;
@@ -26,12 +24,10 @@ class AgentsComparator
     {
         $a1InnovNb = $this->a1->maxConnectInnovation();
         $a2InnovNb = $this->a2->maxConnectInnovation();
-        $this->minCommonConnectInnovNb = min($a1InnovNb, $a2InnovNb);
         $this->maxConnectInnovNb = max($a1InnovNb, $a2InnovNb);
 
         $a1InnovNb = $this->a1->maxNodeInnovation();
         $a2InnovNb = $this->a2->maxNodeInnovation();
-        $this->minCommonNodeInnovNb = min($a1InnovNb, $a2InnovNb);
         $this->maxNodeInnovNb = max($a1InnovNb, $a2InnovNb);
     }
 
@@ -45,15 +41,6 @@ class AgentsComparator
         return max($this->a1->nodeGenesNb(), $this->a2->nodeGenesNb());
     }
 
-    public function minCommonConnectInnovNb(): int
-    {
-        if (null === $this->minCommonConnectInnovNb) {
-            $this->computeInnovNbs();
-        }
-
-        return $this->minCommonConnectInnovNb;
-    }
-
     public function maxConnectInnovNb(): int
     {
         if (null === $this->maxConnectInnovNb) {
@@ -61,15 +48,6 @@ class AgentsComparator
         }
 
         return $this->maxConnectInnovNb;
-    }
-
-    public function minCommonNodeInnovNb(): int
-    {
-        if (null === $this->minCommonNodeInnovNb) {
-            $this->computeInnovNbs();
-        }
-
-        return $this->minCommonNodeInnovNb;
     }
 
     public function maxNodeInnovNb(): int
@@ -90,14 +68,13 @@ class AgentsComparator
     {
         if (null === $this->excessGenesNb) {
             $maxInnov = $this->maxConnectInnovNb();
-            $minInnov = $this->minCommonConnectInnovNb();
 
             $a1Genes = $this->a1->connectGenes();
             $a2Genes = $this->a2->connectGenes();
 
             $count = 0;
             $countA1 = false;
-            for ($i = $minInnov; $i <= $maxInnov; ++$i) {
+            for ($i = 1; $i <= $maxInnov; ++$i) {
                 if (isset($a1Genes[$i]) && isset($a2Genes[$i])) {
                     $count = 0;
                 } elseif (!isset($a2Genes[$i])) {
@@ -152,6 +129,7 @@ class AgentsComparator
     public function avgWeightDifference(): float
     {
         $maxInnov = $this->maxConnectInnovNb();
+
         $a1Genes = $this->a1->connectGenes();
         $a2Genes = $this->a2->connectGenes();
 
@@ -175,13 +153,12 @@ class AgentsComparator
     public function activationFnDifference(): int
     {
         $maxInnov = $this->maxNodeInnovNb();
-        $minInnov = $this->minCommonNodeInnovNb();
 
         $a1Genes = $this->a1->nodeGenes();
         $a2Genes = $this->a2->nodeGenes();
 
         $count = 0;
-        for ($i = $minInnov; $i <= $maxInnov; ++$i) {
+        for ($i = 1; $i <= $maxInnov; ++$i) {
             if (isset($a1Genes[$i]) && isset($a2Genes[$i]) && $a1Genes[$i]->activationFunction() !== $a2Genes[$i]->activationFunction()) {
                 ++$count;
             }
@@ -198,13 +175,12 @@ class AgentsComparator
     public function aggregationFnDifference(): int
     {
         $maxInnov = $this->maxNodeInnovNb();
-        $minInnov = $this->minCommonNodeInnovNb();
 
         $a1Genes = $this->a1->nodeGenes();
         $a2Genes = $this->a2->nodeGenes();
 
         $count = 0;
-        for ($i = $minInnov; $i <= $maxInnov; ++$i) {
+        for ($i = 1; $i <= $maxInnov; ++$i) {
             if (isset($a1Genes[$i]) && isset($a2Genes[$i]) && $a1Genes[$i]->aggregationFunction() !== $a2Genes[$i]->aggregationFunction()) {
                 ++$count;
             }
