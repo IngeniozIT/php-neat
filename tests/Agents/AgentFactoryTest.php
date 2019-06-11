@@ -74,7 +74,7 @@ class AgentFactoryTest extends TestCase
             $this->assertEquals($xorCase[1], $genome->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
+        $this->assertEquals([-5, 10, -10, 10, -10, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
     }
 
     public function testCreateAgent()
@@ -128,6 +128,6 @@ class AgentFactoryTest extends TestCase
             $this->assertEquals($xorCase[1], $genome->activate($xorCase[0]));
         }
 
-        $this->assertEquals([1, -5, 1, 10, 1, -10, 1, 10, 1, -10, 1, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
+        $this->assertEquals([-5, 10, -10, 10, -10, 15], $genome->toVector(5, 6, [[ActivationFunction::class, 'binaryStep']], ['array_sum']));
     }
 }
