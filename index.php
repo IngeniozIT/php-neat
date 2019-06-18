@@ -23,7 +23,7 @@ function xorFitness(PoolInterface $pool)
         foreach ($xor as $x) {
             $fitness -= abs($agent->activate($x[0])[0] - $x[1]);
         }
-        $fitness = ($fitness ** 2) / (4 ** 2);
+        $fitness = $fitness ** 2;
         $agent->setFitness($fitness);
         $fitnesses[$i] = $fitness;
     }
@@ -78,7 +78,7 @@ function customSigmoid(float $val): float
 
 // mt_srand(42);
 $factory = new NeatFactory();
-// $factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
+$factory->setSpeciationFunction(new OriginalSpeciation(3, 1.0, 1.0, 0.4, 0.4, 0.4));
 $factory->setActivationFunctions(['customSigmoid']);
 $factory->setDefaultActivationFunction(['customSigmoid']);
 // $factory->setActivationFunctions([[ActivationFunction::class, 'binaryStep']]);
@@ -86,7 +86,7 @@ $factory->setDefaultActivationFunction(['customSigmoid']);
 // $factory->setActivationFunctions(['customSigmoid', [ActivationFunction::class, 'binaryStep']]);
 // $factory->setDefaultActivationFunction(['customSigmoid']);
 
-$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(0.9), 'xorFitness');
+$neat = $factory->createNeat(3, 1, 150, new MaxThreshold(3.9 ** 2), 'xorFitness');
 $neat->setMaxGenerations(100);
 
 var_dump($neat->run());

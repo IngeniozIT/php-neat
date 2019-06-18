@@ -21,6 +21,11 @@ class OriginalMating implements MatingInterface
     protected $newNodeMutationRate;
     protected $newLinkMutationRate;
     protected $interSpeciesBreedingRate;
+    protected $disableOffspringNodeRate;
+    protected $speciesStagnation;
+    protected $championPreservation;
+
+    protected $speciesFitnesses = [];
 
     /**
      * Constructor.
@@ -37,7 +42,10 @@ class OriginalMating implements MatingInterface
         float $uniformWeightMutationRate = 0.9,
         float $newNodeMutationRate = 0.03,
         float $newLinkMutationRate = 0.05,
-        float $interSpeciesBreedingRate = 0.001
+        float $interSpeciesBreedingRate = 0.001,
+        float $disableOffspringNodeRate = 0.75,
+        float $speciesStagnation = 15,
+        float $championPreservation = 5
     )
     {
         $this->elitesPct = $elitesPct;
@@ -47,12 +55,16 @@ class OriginalMating implements MatingInterface
         $this->newNodeMutationRate = $newNodeMutationRate;
         $this->newLinkMutationRate = $newLinkMutationRate;
         $this->interSpeciesBreedingRate = $interSpeciesBreedingRate;
+        $this->disableOffspringNodeRate = $disableOffspringNodeRate;
+        $this->speciesStagnation = $speciesStagnation;
+        $this->championPreservation = $championPreservation;
     }
 
     public function __invoke(PoolInterface $pool): void
     {
-        $nbOffsprings = $this->getNbOffsprings($pool);
+        $this->removeStagnantSpecies($pool);
         $this->removeAgents($pool);
+        $nbOffsprings = $this->getNbOffsprings($pool);
         $this->mateAgents($pool, $nbOffsprings);
     }
 
@@ -62,29 +74,40 @@ class OriginalMating implements MatingInterface
         $offsprings = [];
         $species = $pool->getSpecies();
         $allowInterspecies = count($species) > 1;
+        $bestFitness = $pool->champion()->fitness();
         foreach ($species as $speciesId => $agentIds) {
-            $delta = $popTarget[$speciesId] - count($agentIds);
-            if ($delta < 0) {
-                while ($delta < 0) {
-                    $pool->removeAgent(array_pop($agentIds));
-                    ++$delta;
-                }
-            } elseif ($delta > 0) {
-                while ($delta > 0) {
-                    // Chose parents
-                    list($p1, $p2) = $this->choseParents($pool, $agentIds, $allowInterspecies);
-                    // Reproduce parents
-                    list($offspringNodeGenes, $offspringConnectGenes) = ($p1->fitness() > $p2->fitness()) ?
-                        $this->getOffspringGenes($p1, $p2) :
-                        $this->getOffspringGenes($p2, $p1);
-                    // Mutate offspring
-                    $this->mutateOffspring($pool, $offspringNodeGenes, $offspringConnectGenes);
-                    // Add offspring to pool
-                    $offsprings[] = $agentFactory->createAgent($offspringNodeGenes, $offspringConnectGenes);
-                    --$delta;
-                }
+            // Preserve species champion
+            foreach ($agentIds as $agentId) {
+                $speciesChampion = $pool->agentNb($agentId);
+                break;
+            }
+            if ((count($agentIds) >= $this->championPreservation || $speciesChampion->fitness() === $bestFitness) && $popTarget[$speciesId] > 0) {
+                $offsprings[] = $speciesChampion;
+                --$popTarget[$speciesId];
+            }
+            // Populate species
+            while ($popTarget[$speciesId]-- > 0) {
+                // Chose parents
+                list($p1, $p2) = $this->choseParents($pool, $agentIds, $allowInterspecies);
+                // Reproduce parents
+                list($offspringNodeGenes, $offspringConnectGenes) = ($p1->fitness() > $p2->fitness()) ?
+                    $this->getOffspringGenes($p1, $p2) :
+                    $this->getOffspringGenes($p2, $p1);
+                // Mutate offspring
+                $this->mutateOffspring($pool, $offspringNodeGenes, $offspringConnectGenes);
+                // Add offspring to pool
+                $offsprings[] = $agentFactory->createAgent($offspringNodeGenes, $offspringConnectGenes);
             }
         }
+
+        // Remove old agents
+        foreach ($species as $speciesId => $agentIds) {
+            foreach ($agentIds as $agentId) {
+                $pool->removeAgent($agentId);
+            }
+        }
+
+        // Add new agents
         foreach ($offsprings as $offspring) {
             $pool->addAgent($offspring);
         }
@@ -118,9 +141,13 @@ class OriginalMating implements MatingInterface
                 // Add node
                 $nodeGenes[$newNode->innovNb()] = $newNode;
                 // Add in connection
-                $connectGenes[$newConnections[0]->innovNb()] = $newConnections[0];
+                if (isset($newConnections[0])) {
+                    $connectGenes[$newConnections[0]->innovNb()] = $newConnections[0];
+                }
                 // Add out connection
-                $connectGenes[$newConnections[1]->innovNb()] = $newConnections[1];
+                if (isset($newConnections[1])) {
+                    $connectGenes[$newConnections[1]->innovNb()] = $newConnections[1];
+                }
             }
         }
         // New link mutation
@@ -213,6 +240,43 @@ class OriginalMating implements MatingInterface
     }
 
     /**
+     * Remove any stagnant species.
+     *
+     * @param PoolInterface $pool
+     *
+     * @see http://nn.cs.utexas.edu/downloads/papers/stanley.gecco02_1.pdf - section 3.3
+     */
+    protected function removeStagnantSpecies(PoolInterface $pool): void
+    {
+        if ($this->speciesStagnation <= 1) {
+            return;
+        }
+        $species = $pool->getSpecies();
+        if (count($species) <= 1) {
+            return;
+        }
+        $championFitness = $pool->champion()->fitness();
+        foreach ($species as $speciesId => $agents) {
+            foreach ($agents as $agentId) {
+                $speciesChampionFitness = (float)$pool->agentNb($agentId)->fitness();
+                break;
+            }
+            if (!isset($this->speciesFitnesses[$speciesId]) || $this->speciesFitnesses[$speciesId][1] < $speciesChampionFitness) {
+                $this->speciesFitnesses[$speciesId] = [1, $speciesChampionFitness];
+            } else {
+                ++$this->speciesFitnesses[$speciesId][0];
+            }
+
+            if ($speciesChampionFitness < $championFitness && $this->speciesFitnesses[$speciesId][0] >= $this->speciesStagnation) {
+                unset($this->speciesFitnesses[$speciesId]);
+                foreach ($agents as $agentId) {
+                    $pool->removeAgent($agentId);
+                }
+            }
+        }
+    }
+
+    /**
      * Remove the worst agents from each species.
      *
      * @param PoolInterface $pool
@@ -221,8 +285,32 @@ class OriginalMating implements MatingInterface
      */
     protected function removeAgents(PoolInterface $pool): void
     {
+        $championFitness = $pool->champion()->fitness();
         $species = $pool->getSpecies();
-        foreach ($species as $agents) {
+        $speciesCount = count($species);
+        foreach ($species as $speciesId => $agents) {
+            // Stagnation
+            if ($this->speciesStagnation > 0) {
+                foreach ($agents as $agentId) {
+                    $speciesChampionFitness = (float)$pool->agentNb($agentId)->fitness();
+                    break;
+                }
+                if (!isset($this->speciesFitnesses[$speciesId]) || $this->speciesFitnesses[$speciesId][1] < $speciesChampionFitness) {
+                    $this->speciesFitnesses[$speciesId] = [1, $speciesChampionFitness];
+                } else {
+                    ++$this->speciesFitnesses[$speciesId][0];
+                }
+
+                if ($speciesChampionFitness < $championFitness && $this->speciesFitnesses[$speciesId][0] >= $this->speciesStagnation && $speciesCount > 1) {
+                    unset($this->speciesFitnesses[$speciesId]);
+                    foreach ($agents as $agentId) {
+                        $pool->removeAgent($agentId);
+                    }
+                    continue;
+                }
+            }
+
+            // Non-stagnant species
             $speciesSize = count($agents);
             $keepAlive = floor($speciesSize * $this->elitesPct);
 
@@ -258,10 +346,18 @@ class OriginalMating implements MatingInterface
             if (!isset($p1ConnectGenes[$i])) {
                 continue;
             }
-            $nodeGene = !isset($p2ConnectGenes[$i]) || rand() % 2 ?
+            $connectGene = !isset($p2ConnectGenes[$i]) || rand() % 2 ?
                 $p1ConnectGenes[$i] :
                 $p2ConnectGenes[$i];
-            $offConnectGenes[$i] = clone $nodeGene;
+            $offConnectGenes[$i] = clone $connectGene;
+            if ((
+                (isset($p2ConnectGenes[$i]) && $p2ConnectGenes[$i]->isDisabled()) ||
+                (isset($p1ConnectGenes[$i]) && $p1ConnectGenes[$i]->isDisabled())
+            ) && Random::frand() <= $this->disableOffspringNodeRate) {
+                $offConnectGenes[$i]->setDisabled(true);
+            } else {
+                $offConnectGenes[$i]->setDisabled(false);
+            }
             $offNodeGenes[$offConnectGenes[$i]->inId()] = true;
             $offNodeGenes[$offConnectGenes[$i]->outId()] = true;
         }

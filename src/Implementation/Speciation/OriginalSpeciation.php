@@ -27,6 +27,7 @@ class OriginalSpeciation implements SpeciationInterface
     protected $c3;
     protected $c4;
     protected $c5;
+    protected $speciesStagnation = [];
 
     /**
      * Constructor.
